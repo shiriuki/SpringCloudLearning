@@ -1,0 +1,8 @@
+rootProject.name = 'SpringCloudLearning'
+
+include 'config-server'
+include 'service-discovery-agent'
+include 'grpc-lib'
+include 'exchange-rate'
+include 'simple-rest'
+

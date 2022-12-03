@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: exchangerate
+  profiles:
+    active: dev
+  config:
+    import: configserver:http://192.168.2.192:8888

@@ -1,0 +1,10 @@
+plugins {
+    id 'application'
+    id 'com.palantir.docker'
+}
+
+docker {
+    name "${project.group}/${project.name}:${project.version}"
+    dockerfile file('docker/Dockerfile')
+    files 'docker/entrypoint.sh', "$buildDir/libs/"
+}

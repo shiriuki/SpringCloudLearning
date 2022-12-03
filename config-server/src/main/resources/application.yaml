@@ -1,0 +1,20 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: configserver
+  profiles:
+    active: native
+
+  cloud:
+    config:
+      server:
+        native:
+          search-locations:
+            - "file:./src/main/resources/configs/{application}"
+            - "classpath:/configs/{application}"
+            - "file:/opt/mecc/configs/{application}"
+
+encrypt:
+  key: mecckey

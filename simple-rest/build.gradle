@@ -1,0 +1,22 @@
+plugins {
+    id 'scl.java'
+    id 'scl.docker'
+    id 'scl.spring-cloud'
+    id 'scl.service'
+}
+
+application {
+    mainClassName = 'com.mecc.simplerest.SimpleRestApplication'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.mecc.simplerest.SimpleRestApplication'
+    }
+}
+
+dependencies {
+    implementation project(':grpc-lib')
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'net.devh:grpc-client-spring-boot-starter:2.14.0.RELEASE'
+}

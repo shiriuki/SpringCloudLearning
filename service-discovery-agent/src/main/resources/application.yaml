@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: serviceDiscoveryAgent
+  config:
+    import: configserver:http://192.168.2.192:8888

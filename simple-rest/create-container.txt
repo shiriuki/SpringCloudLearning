@@ -1,0 +1,1 @@
+docker run --name mecc-simple-rest --env SPRING_PROFILES_ACTIVE=dev -p 9003:9003 com.mecc/simple-rest:1.0.0

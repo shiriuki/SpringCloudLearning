@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.mecc'
+version = '1.0.0'
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+repositories {
+    mavenCentral()
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+dependencies {
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+    testCompileOnly 'org.projectlombok:lombok:1.18.24'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+}
