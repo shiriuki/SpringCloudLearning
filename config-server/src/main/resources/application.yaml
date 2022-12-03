@@ -18,3 +18,22 @@ spring:
 
 encrypt:
   key: mecckey
+
+info:
+  app:
+    name: Cloud Configuration microservice
+    description: Cloud Configuration application
+    version: 1.0.0
+
+management:
+  info:
+    env:
+      enabled: true
+  endpoints:
+    enabled-by-default: false
+  endpoint:
+    info:
+      enabled: true
+    health:
+      enabled: true
+
