@@ -6,6 +6,8 @@ spring:
     name: configserver
   profiles:
     active: native
+  jmx:
+    enabled: true
 
   cloud:
     config:
