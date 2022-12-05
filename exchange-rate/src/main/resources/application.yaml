@@ -1,7 +1,7 @@
 spring:
   application:
-    name: exchangerate
+    name: exchange-rate
   profiles:
     active: dev
   config:
-    import: configserver:http://192.168.2.192:8888
+    import: configserver:${CONFIG_SERVER_URL:http://localhost:8888}
