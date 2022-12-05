@@ -1,6 +1,10 @@
 services:
   config-server:
     image: com.mecc/config-server:1.0.0
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     ports:
       - "8888:8888"
     environment:
@@ -16,14 +20,19 @@ services:
     networks:
       - mecc
 
-  service-discovery-agent:
+  service-discovery-agent-1:
     image: com.mecc/service-discovery-agent:1.0.0
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     ports:
       - "8889:8889"
     environment:
       CONFIG_SERVER_URL: http://config-server:8888
-      DISCOVERY_SERVICE_ZONE: http://service-discovery-agent:8889/eureka/
-      DISCOVERY_SERVICE_HOST: service-discovery-agent
+      DISCOVERY_SERVICES: http://service-discovery-agent-2:8889/eureka/
+      DISCOVERY_SERVICE_HOST: service-discovery-agent-1
+      DISCOVERY_SERVICE_ZONE: default
     depends_on:
       config-server:
         condition: service_healthy
@@ -31,23 +40,55 @@ services:
       test: curl --fail http://localhost:8889/actuator/ || exit 1
       interval: 5s
       retries: 3
-      start_period: 5s
+      start_period: 10s
+      timeout: 10s
+    networks:
+      - mecc
+
+  service-discovery-agent-2:
+    image: com.mecc/service-discovery-agent:1.0.0
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    ports:
+      - "8890:8889"
+    environment:
+      CONFIG_SERVER_URL: http://config-server:8888
+      DISCOVERY_SERVICES: http://service-discovery-agent-1:8889/eureka/
+      DISCOVERY_SERVICE_HOST: service-discovery-agent-2
+      DISCOVERY_SERVICE_ZONE: default
+    depends_on:
+      config-server:
+        condition: service_healthy
+    healthcheck:
+      test: curl --fail http://localhost:8889/actuator/ || exit 1
+      interval: 5s
+      retries: 3
+      start_period: 10s
       timeout: 10s
     networks:
       - mecc
 
   exchange-rate:
     image: com.mecc/exchange-rate:1.0.0
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     ports:
       - "9002:9002"
     environment:
       SPRING_PROFILES_ACTIVE: dev
       CONFIG_SERVER_URL: http://config-server:8888
-      DISCOVERY_SERVICE_ZONE: http://service-discovery-agent:8889/eureka/
+      DISCOVERY_SERVICES: http://service-discovery-agent-1:8889/eureka/, http://service-discovery-agent-2:8889/eureka/
+      DISCOVERY_SERVICE_ZONE: default
     depends_on:
       config-server:
         condition: service_healthy
-      service-discovery-agent:
+      service-discovery-agent-1:
+        condition: service_healthy
+      service-discovery-agent-2:
         condition: service_healthy
     healthcheck:
       test: grpc_health_probe -addr=localhost:9002 || exit 1
@@ -60,17 +101,24 @@ services:
 
   simple-rest:
     image: com.mecc/simple-rest:1.0.0
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     ports:
       - "9003:9003"
     environment:
       SPRING_PROFILES_ACTIVE: dev
       CONFIG_SERVER_URL: http://config-server:8888
-      DISCOVERY_SERVICE_ZONE: http://service-discovery-agent:8889/eureka/
+      DISCOVERY_SERVICES: http://service-discovery-agent-1:8889/eureka/, http://service-discovery-agent-2:8889/eureka/
+      DISCOVERY_SERVICE_ZONE: default
       EXCHANGE_RATE_SERVICE_NAME: exchange-rate
     depends_on:
       config-server:
         condition: service_healthy
-      service-discovery-agent:
+      service-discovery-agent-1:
+        condition: service_healthy
+      service-discovery-agent-2:
         condition: service_healthy
       exchange-rate:
         condition: service_healthy
