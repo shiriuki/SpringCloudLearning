@@ -1,1 +1,0 @@
-docker run --volume /Users/manuelcalvo/Documents/aprojects/configs:/opt/mecc/configs --name mecc-config-server -p 8888:8888 com.mecc/config-server:1.0.0

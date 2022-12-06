@@ -1,1 +1,0 @@
-docker run --name mecc-service-discovery-agent --env SPRING_PROFILES_ACTIVE=dev -p 8889:8889 com.mecc/service-discovery-agent:1.0.0

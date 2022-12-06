@@ -5,4 +5,5 @@ include 'service-discovery-agent'
 include 'grpc-lib'
 include 'exchange-rate'
 include 'simple-rest'
+include 'currency'
 

@@ -1,1 +1,0 @@
-docker run --name mecc-exchange-rate --env SPRING_PROFILES_ACTIVE=dev -p 9002:9002 com.mecc/exchange-rate:1.0.0
