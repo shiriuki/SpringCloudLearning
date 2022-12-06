@@ -1,0 +1,46 @@
+---
+openapi: 3.0.2
+info:
+  title: Currency
+  version: 1.0.0
+paths:
+  /currencies:
+    get:
+      tags:
+      - currency
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrencyList'
+          description: There are some currencies.
+        "204":
+          description: There are no currencies.
+      operationId: getCurrencies
+components:
+  schemas:
+    Currency:
+      description: ""
+      required:
+      - code
+      - name
+      type: object
+      properties:
+        code:
+          description: ""
+          type: string
+        name:
+          description: ""
+          type: string
+    CurrencyList:
+      description: ""
+      required:
+      - Currencies
+      type: object
+      properties:
+        Currencies:
+          description: ""
+          type: array
+          items:
+            $ref: '#/components/schemas/Currency'

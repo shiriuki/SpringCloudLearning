@@ -16,7 +16,7 @@ import static net.devh.boot.grpc.common.util.GrpcUtils.CLOUD_DISCOVERY_METADATA_
 
 @org.springframework.stereotype.Service
 public class Service {
-    private DiscoveryClient discoveryClient;
+    private final DiscoveryClient discoveryClient;
 
     @GrpcClient("exchange-rate")
     private ExchangeRateServiceBlockingStub exchangeRateService;
@@ -38,12 +38,14 @@ public class Service {
     }
 
 
-    public Double getExchangeRate(String currency) {
+    public RateInfo getExchangeRate(String currency) {
+        currency = currency.toUpperCase();
+
         GetExchangeRateRequest.Builder requestBuilder = GetExchangeRateRequest.newBuilder();
         requestBuilder.setCurrency(currency);
-
         GetExchangeRateResponse response = exchangeRateService.getExchangeRate(requestBuilder.build());
-        return response.getRate();
+
+        return new RateInfo("USD", currency, response.getRate());
     }
 
 
@@ -53,5 +55,15 @@ public class Service {
     static class Address {
         private String ip;
         private Integer port;
+    }
+
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    static class RateInfo {
+        private String fromCurrency;
+        private String toCurrency;
+        private Double rate;
     }
 }

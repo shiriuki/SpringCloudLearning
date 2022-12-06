@@ -1,18 +1,15 @@
 package com.mecc.currency;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import com.mecc.currency.api.CurrencyApi;
+import com.mecc.currency.api.model.CurrencyList;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 
 @RefreshScope
 @RestController
-public class Controller {
+public class Controller implements CurrencyApi {
 
     private final CurrencyService currencyService;
 
@@ -22,16 +19,9 @@ public class Controller {
     }
 
 
-    @GetMapping("/list")
-    public ListResponse list() {
-        return new ListResponse(true, currencyService.getList(), "");
+    @Override
+    public ResponseEntity<CurrencyList> getCurrencies() {
+        return ResponseEntity.ok().body(currencyService.getList());
     }
 
-
-    @Getter @Setter @AllArgsConstructor
-    static class ListResponse {
-        private boolean success;
-        private List<CurrencyService.CurrencyInfo> list;
-        private String error = "";
-    }
 }

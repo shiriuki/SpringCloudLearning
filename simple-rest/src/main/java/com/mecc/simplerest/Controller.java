@@ -1,11 +1,8 @@
 package com.mecc.simplerest;
 
-import io.grpc.StatusRuntimeException;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,60 +27,37 @@ public class Controller {
 
 
     @GetMapping("/sayhello")
-    public String sayHello() { return msg; }
+    public ResponseEntity<String> sayHello() {
+        return ResponseEntity.ok().body(msg);
+    }
 
 
     @GetMapping("/showsecure")
-    public String showSecure() {
-        return secureMsg;
+    public ResponseEntity<String> showSecure() {
+        return ResponseEntity.ok().body(secureMsg);
     }
 
 
     @GetMapping("/showavailable/{serviceId}")
-    public ServiceAvailableResponse showAvailable(@PathVariable String serviceId) {
-        ServiceAvailableResponse response = new ServiceAvailableResponse();
+    public ResponseEntity<List<Service.Address>> showAvailable(@PathVariable String serviceId) {
 
         try {
-            response.list = service.showAvailable(serviceId);
-            response.success = true;
+            return ResponseEntity.ok().body(service.showAvailable(serviceId));
 
-        } catch (Throwable e)  {
-            response.error = e.getMessage();
+        } catch (Throwable e) {
+            return ResponseEntity.noContent().build();
         }
-
-        return response;
     }
 
 
     @GetMapping("/getrate/{currency}")
-    public RateResponse getRate(@PathVariable String currency) {
-        RateResponse response = new RateResponse();
+    public ResponseEntity<Service.RateInfo> getRate(@PathVariable String currency) {
 
         try {
-            response.rate = service.getExchangeRate(currency);
-            response.success = true;
+            return ResponseEntity.ok().body(service.getExchangeRate(currency));
 
-        } catch (StatusRuntimeException e)  {
-            response.error = e.getMessage();
+        } catch (Throwable e) {
+            return ResponseEntity.noContent().build();
         }
-
-        return response;
     }
-
-
-    @Getter @Setter @NoArgsConstructor
-    static class ServiceAvailableResponse {
-        private boolean success;
-        private List<Service.Address> list;
-        private String error = "";
-    }
-
-
-    @Getter @Setter @NoArgsConstructor
-    static class RateResponse {
-        private boolean success;
-        private Double rate;
-        private String error = "";
-    }
-
 }
