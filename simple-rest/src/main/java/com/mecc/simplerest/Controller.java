@@ -1,27 +1,21 @@
 package com.mecc.simplerest;
 
 import io.grpc.StatusRuntimeException;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static net.devh.boot.grpc.common.util.GrpcUtils.CLOUD_DISCOVERY_METADATA_PORT;
 
 @RefreshScope
 @RestController
 public class Controller {
-    private final DiscoveryClient discoveryClient;
-    private final ExchangeRateService exchangeRateService;
+
+    private final Service service;
 
     @Value( "${msg}" )
     private String msg;
@@ -30,9 +24,8 @@ public class Controller {
     private String secureMsg;
 
 
-    public Controller(DiscoveryClient discoveryClient, ExchangeRateService exchangeRateService) {
-        this.discoveryClient = discoveryClient;
-        this.exchangeRateService = exchangeRateService;
+    public Controller(Service service) {
+        this.service = service;
     }
 
 
@@ -46,15 +39,19 @@ public class Controller {
     }
 
 
-    @GetMapping("/showavailable/{service}")
-    public List<Address> showAvailable(@PathVariable String service) {
-        return discoveryClient.getInstances(service)
-                .stream().map(i -> new Address(
-                        i.getHost(),
-                        i.getMetadata().get(CLOUD_DISCOVERY_METADATA_PORT) != null ?
-                                Integer.parseInt(i.getMetadata().get(CLOUD_DISCOVERY_METADATA_PORT)) :
-                                i.getPort()))
-                .collect(Collectors.toList());
+    @GetMapping("/showavailable/{serviceId}")
+    public ServiceAvailableResponse showAvailable(@PathVariable String serviceId) {
+        ServiceAvailableResponse response = new ServiceAvailableResponse();
+
+        try {
+            response.list = service.showAvailable(serviceId);
+            response.success = true;
+
+        } catch (Throwable e)  {
+            response.error = e.getMessage();
+        }
+
+        return response;
     }
 
 
@@ -63,7 +60,7 @@ public class Controller {
         RateResponse response = new RateResponse();
 
         try {
-            response.rate = exchangeRateService.getExchangeRate(currency);
+            response.rate = service.getExchangeRate(currency);
             response.success = true;
 
         } catch (StatusRuntimeException e)  {
@@ -75,15 +72,18 @@ public class Controller {
 
 
     @Getter @Setter @NoArgsConstructor
+    static class ServiceAvailableResponse {
+        private boolean success;
+        private List<Service.Address> list;
+        private String error = "";
+    }
+
+
+    @Getter @Setter @NoArgsConstructor
     static class RateResponse {
         private boolean success;
         private Double rate;
         private String error = "";
     }
 
-    @Getter @Setter @AllArgsConstructor
-    static class Address {
-        private String ip;
-        private Integer port;
-    }
 }
