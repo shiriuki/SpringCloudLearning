@@ -3,6 +3,7 @@ openapi: 3.0.2
 info:
   title: Currency
   version: 1.0.0
+  description: "Built using: https://studio.apicur.io/"
 paths:
   /currencies:
     get:
@@ -13,7 +14,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CurrencyList'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Currency'
           description: There are some currencies.
         "204":
           description: There are no currencies.
@@ -33,14 +36,3 @@ components:
         name:
           description: ""
           type: string
-    CurrencyList:
-      description: ""
-      required:
-      - Currencies
-      type: object
-      properties:
-        Currencies:
-          description: ""
-          type: array
-          items:
-            $ref: '#/components/schemas/Currency'

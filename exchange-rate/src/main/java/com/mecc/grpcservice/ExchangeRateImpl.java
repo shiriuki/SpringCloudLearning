@@ -11,7 +11,7 @@ public class ExchangeRateImpl extends ExchangeRateServiceGrpc.ExchangeRateServic
     @Override
     public void getExchangeRate(GetExchangeRateRequest request,
                                 StreamObserver<GetExchangeRateResponse> responseObserver) {
-        String currency = request.getCurrency();
+        String currency = request.getCurrency().toUpperCase();
 
         if (!currency.equals("CRC") && !currency.equals("MXN")) {
             throw new IllegalArgumentException("don't know the exchange rate of " + currency);

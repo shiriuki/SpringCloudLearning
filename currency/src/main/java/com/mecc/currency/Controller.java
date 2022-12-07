@@ -1,10 +1,12 @@
 package com.mecc.currency;
 
 import com.mecc.currency.api.CurrencyApi;
-import com.mecc.currency.api.model.CurrencyList;
+import com.mecc.currency.api.model.Currency;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 
 @RefreshScope
@@ -20,7 +22,7 @@ public class Controller implements CurrencyApi {
 
 
     @Override
-    public ResponseEntity<CurrencyList> getCurrencies() {
+    public ResponseEntity<List<Currency>> getCurrencies() {
         return ResponseEntity.ok().body(currencyService.getList());
     }
 

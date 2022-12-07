@@ -17,6 +17,7 @@ jar {
 
 dependencies {
     implementation project(':grpc-lib')
+    implementation project(":currency-api")
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'net.devh:grpc-client-spring-boot-starter:2.14.0.RELEASE'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'

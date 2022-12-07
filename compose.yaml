@@ -141,6 +141,7 @@ services:
       DISCOVERY_SERVICES: http://service-discovery-agent-1:8889/eureka/, http://service-discovery-agent-2:8889/eureka/
       DISCOVERY_SERVICE_ZONE: default
       EXCHANGE_RATE_SERVICE_NAME: exchange-rate
+      CURRENCY_SERVICE_NAME: currency
     depends_on:
       config-server:
         condition: service_healthy

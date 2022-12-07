@@ -13,10 +13,11 @@ swaggerSources {
     inputFile = file(apiYaml)
     def ignoreFile = file("${projectDir}/src/main/resources/api/.openapi-generator-ignore")
     code {
-      language = 'spring'
-      configFile = file(configJson)
-      rawOptions = ['--ignore-file-override', ignoreFile, '--type-mappings', typeMappings, '--import-mappings', importMappings] as List<String>
-      components = [models: true, apis: true, supportingFiles: 'ApiUtil.java']
+        // See: https://openapi-generator.tech/docs/generators/spring/
+        language = 'spring'
+        configFile = file(configJson)
+        rawOptions = ['--ignore-file-override', ignoreFile, '--type-mappings', typeMappings, '--import-mappings', importMappings] as List<String>
+        components = [models: true, apis: true, supportingFiles: 'ApiUtil.java']
     }
   }
 }
@@ -34,5 +35,6 @@ dependencies {
     compileOnly 'javax.xml.bind:jaxb-api:2.3.1'
     compileOnly 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
     compileOnly 'org.springframework.boot:spring-boot-starter-hateoas'
+    compileOnly 'org.springframework.cloud:spring-cloud-starter-openfeign'
     // OpenAPI Ends
 }

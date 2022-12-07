@@ -1,17 +1,19 @@
 package com.mecc.currency;
 
 import com.mecc.currency.api.model.Currency;
-import com.mecc.currency.api.model.CurrencyList;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service
 public class CurrencyService {
 
-    public CurrencyList getList() {
-        return new CurrencyList() {{
-            addCurrenciesItem(new Currency().code("CRC").name("Costa Rican Colon"));
-            addCurrenciesItem(new Currency().code("MXN").name("Mexican Peso"));
+    public List<Currency> getList() {
+        return new ArrayList<>() {{
+            add(new Currency().code("CRC").name("Costa Rican Colon"));
+            add(new Currency().code("MXN").name("Mexican Peso"));
         }};
     }
 }
