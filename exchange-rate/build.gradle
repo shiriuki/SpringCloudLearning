@@ -17,5 +17,6 @@ jar {
 
 dependencies {
     implementation project(":grpc-lib")
-    implementation 'net.devh:grpc-server-spring-boot-starter:2.14.0.RELEASE'
+    implementation 'io.grpc:grpc-netty:1.51.0'
+    implementation 'net.devh:grpc-server-spring-boot-starter:2.14.0.RELEASE' exclude group: 'io.grpc', module: 'grpc-netty-shaded'
 }
