@@ -99,7 +99,7 @@ services:
     networks:
       - mecc
 
-  currency:
+  currency1:
     image: com.mecc/currency:1.0.0
     deploy:
       resources:
@@ -107,6 +107,34 @@ services:
           memory: 128M
     ports:
       - "9004:9004"
+    environment:
+      CONFIG_SERVER_URL: http://config-server:8888
+      DISCOVERY_SERVICES: http://service-discovery-agent-1:8889/eureka/, http://service-discovery-agent-2:8889/eureka/
+      DISCOVERY_SERVICE_ZONE: default
+    depends_on:
+      config-server:
+        condition: service_healthy
+      service-discovery-agent-1:
+        condition: service_healthy
+      service-discovery-agent-2:
+        condition: service_healthy
+    healthcheck:
+      test: curl --fail http://localhost:9004/actuator/ || exit 1
+      interval: 5s
+      retries: 3
+      start_period: 10s
+      timeout: 10s
+    networks:
+      - mecc
+
+  currency2:
+    image: com.mecc/currency:1.0.0
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    ports:
+      - "9005:9004"
     environment:
       CONFIG_SERVER_URL: http://config-server:8888
       DISCOVERY_SERVICES: http://service-discovery-agent-1:8889/eureka/, http://service-discovery-agent-2:8889/eureka/
@@ -151,7 +179,9 @@ services:
         condition: service_healthy
       exchange-rate:
         condition: service_healthy
-      currency:
+      currency1:
+        condition: service_healthy
+      currency2:
         condition: service_healthy
     networks:
       - mecc
