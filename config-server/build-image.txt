@@ -1,2 +1,1 @@
-// gradle bootBuildImage --imageName=com.mecc/config-server:1.0.0 --pullPolicy=IF_NOT_PRESENT
-gradle clean build -x test docker
+gradle bootBuildImage

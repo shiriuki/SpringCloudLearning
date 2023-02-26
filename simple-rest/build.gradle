@@ -1,18 +1,7 @@
 plugins {
     id 'scl.java'
-    id 'scl.docker'
     id 'scl.spring-cloud'
     id 'scl.service'
-}
-
-application {
-    mainClassName = 'com.mecc.simplerest.SimpleRestApplication'
-}
-
-jar {
-    manifest {
-        attributes 'Main-Class': 'com.mecc.simplerest.SimpleRestApplication'
-    }
 }
 
 dependencies {
