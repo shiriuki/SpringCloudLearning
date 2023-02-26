@@ -1,1 +1,7 @@
 gradle bootBuildImage
+docker run --user="root" --entrypoint launcher com.mecc/exchange-rate:1.0.0 "apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/* && wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.3.2/grpc_health_probe-linux-amd64 && chmod 777 /bin/grpc_health_probe"
+docker ps -a
+docker commit 293e7524f753 com.mecc/exchange-rate:1.0.0
+docker run --user="cnb" --entrypoint /cnb/process/web com.mecc/exchange-rate:1.0.0
+docker ps -a
+docker commit f3aa9450127e com.mecc/exchange-rate:1.0.0

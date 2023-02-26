@@ -1,1 +1,7 @@
 gradle bootBuildImage
+docker run --user="root" --entrypoint launcher com.mecc/simple-rest:1.0.0 "apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/* "
+docker ps -a
+docker commit c79caafad25b com.mecc/simple-rest:1.0.0
+docker run --user="cnb" --entrypoint /cnb/process/web com.mecc/simple-rest:1.0.0
+docker ps -a
+docker commit ea9744659c48 com.mecc/simple-rest:1.0.0

@@ -1,1 +1,7 @@
 gradle bootBuildImage
+docker run --user="root" --entrypoint launcher com.mecc/config-server:1.0.0 "apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/* "
+docker ps -a
+docker commit 3192031030d6 com.mecc/config-server:1.0.0
+docker run --user="cnb" --entrypoint /cnb/process/web com.mecc/config-server:1.0.0
+docker ps -a
+docker commit 1e3849efe3d6 com.mecc/config-server:1.0.0

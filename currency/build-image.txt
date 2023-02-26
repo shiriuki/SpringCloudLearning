@@ -1,1 +1,7 @@
 gradle bootBuildImage
+docker run --user="root" --entrypoint launcher com.mecc/currency:1.0.0 "apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/* "
+docker ps -a
+docker commit 80d9e8cd81ba com.mecc/currency:1.0.0
+docker run --user="cnb" --entrypoint /cnb/process/web com.mecc/currency:1.0.0
+docker ps -a
+docker commit 996a92d2fc9a com.mecc/currency:1.0.0

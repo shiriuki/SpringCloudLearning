@@ -15,6 +15,14 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
+tasks.named("bootBuildImage") {
+    imageName = "${project.group}/${project.name}:${project.version}"
+    pullPolicy = "IF_NOT_PRESENT"
+    buildpacks = ["gcr.io/paketo-buildpacks/adoptium", "urn:cnb:builder:paketo-buildpacks/java"]
+    environment["JAVA_TOOL_OPTIONS"] = "-XX:MaxDirectMemorySize=10M -XX:MaxMetaspaceSize=64M -XX:ReservedCodeCacheSize=64M -Xss128K"
+    environment["BPL_JVM_THREAD_COUNT"] = "32"
+}
+
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
