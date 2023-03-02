@@ -4,7 +4,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 630M
+          memory: 256M
     ports:
       - "8888:8888"
     environment:
@@ -25,7 +25,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 650M
+          memory: 256M
     ports:
       - "8889:8889"
     environment:
@@ -50,7 +50,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 650M
+          memory: 256M
     ports:
       - "8890:8889"
     environment:
@@ -75,7 +75,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 450M
+          memory: 256M
     ports:
       - "9002:9002"
     environment:
@@ -104,7 +104,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 650M
+          memory: 256M
     ports:
       - "9004:9004"
     environment:
@@ -132,7 +132,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 650M
+          memory: 256M
     ports:
       - "9005:9004"
     environment:
@@ -160,7 +160,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 650M
+          memory: 256M
     ports:
       - "9003:9003"
     environment:

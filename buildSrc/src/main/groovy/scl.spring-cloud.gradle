@@ -1,11 +1,42 @@
 plugins {
     id 'org.springframework.boot'
     id 'io.spring.dependency-management'
+    id 'com.bmuschko.docker-remote-api'
 }
 
 ext {
     set('springCloudVersion', "2021.0.5")
 }
+
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+
+task createDockerfile(type: Dockerfile) {
+  destFile = project.file('build/docker/Dockerfile')
+  from "eclipse-temurin:11"
+  label(['maintainer': 'Manuel Calvo "manuel.calvo.cantillo@gmail.com"'])
+  runCommand "apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*"
+  copyFile "${bootJar.archiveFileName.get()}", "/app/app.jar"
+  environmentVariable "JAVA_OPTS", ""
+  entryPoint "java"
+  defaultCommand "-jar", "/app/app.jar"
+}
+
+task syncAppArchive(type: Sync) {
+  dependsOn assemble
+  from bootJar.archivePath
+  into createDockerfile.getDestDir()
+}
+
+task buildImage(type: DockerBuildImage) {
+  dependsOn createDockerfile
+  inputDir = createDockerfile.getDestDir()
+  quiet = true
+  pull = false
+  images.add( "${project.group}/${project.name}:${project.version}" )
+}
+
+createDockerfile.dependsOn syncAppArchive
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -13,14 +44,6 @@ dependencies {
     implementation 'org.springframework.retry:spring-retry'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-}
-
-tasks.named("bootBuildImage") {
-    imageName = "${project.group}/${project.name}:${project.version}"
-    pullPolicy = "IF_NOT_PRESENT"
-    buildpacks = ["gcr.io/paketo-buildpacks/adoptium", "urn:cnb:builder:paketo-buildpacks/java"]
-    environment["JAVA_TOOL_OPTIONS"] = "-XX:MaxDirectMemorySize=10M -XX:MaxMetaspaceSize=64M -XX:ReservedCodeCacheSize=64M -Xss128K"
-    environment["BPL_JVM_THREAD_COUNT"] = "32"
 }
 
 dependencyManagement {

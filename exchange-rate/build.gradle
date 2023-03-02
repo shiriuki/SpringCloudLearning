@@ -4,6 +4,8 @@ plugins {
     id 'scl.service'
 }
 
+createDockerfile.runCommand("wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.3.2/grpc_health_probe-linux-amd64 && chmod +x /bin/grpc_health_probe")
+
 dependencies {
     implementation project(":grpc-lib")
     implementation 'io.grpc:grpc-netty:1.51.0'
