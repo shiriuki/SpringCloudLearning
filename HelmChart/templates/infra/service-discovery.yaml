@@ -1,4 +1,5 @@
-{{- $service := .Values.configServer }}
+{{- $service := .Values.serviceDiscovery }}
+{{- $configServer := .Values.configServer }}
 {{- $image := printf "%s:%s" $service.image .Values.general.imageTag }}
 apiVersion: apps/v1
 kind: StatefulSet
@@ -21,26 +22,19 @@ spec:
       nodeSelector:
 {{ toYaml . | indent 8 }}
       {{- end }}
-      volumes:
-        - name: configs
-          hostPath:
-            path: /scl/config-server/src/main/resources/configs
-            type: DirectoryOrCreate
       containers:
         - name: {{ $service.name }}
           image: {{ $image }}
           imagePullPolicy: {{ .Values.general.imagePullPolicy }}
           ports:
             - containerPort: {{ $service.containerPort }}
-          volumeMounts:
-            - name: configs
-              mountPath: /opt/mecc/configs
           env:
-            - name: ENCRYPT_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}-{{ $service.name }}
-                  key: encryptKey
+            - name: CONFIG_SERVER_URL
+              value: "http://{{ .Release.Name }}-{{ $configServer.name }}.{{ .Release.Namespace }}.svc.cluster.local:{{ $configServer.clusterPort }}"
+            - name: EUREKA_CLIENT_REGISTERWITHEUREKA
+              value: "false"
+            - name: EUREKA_CLIENT_FETCHREGISTRY
+              value: "false"
 ---
 apiVersion: v1
 kind: Service
@@ -73,10 +67,3 @@ spec:
         targetPort: {{ $service.containerPort }}
 ---
 {{- end }}
-apiVersion: v1
-kind: Secret
-metadata:
-  name: {{ .Release.Name }}-{{ $service.name }}
-  namespace: {{ .Release.Namespace }}
-data:
-  encryptKey: "bWVjY2tleQo="

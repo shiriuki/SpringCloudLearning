@@ -1,7 +1,9 @@
-{{- $service := .Values.configServer }}
+{{- $service := .Values.simpleRest }}
+{{- $configServer := .Values.configServer }}
+{{- $discoveryServer := .Values.serviceDiscovery }}
 {{- $image := printf "%s:%s" $service.image .Values.general.imageTag }}
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: {{ .Release.Name }}-{{ $service.name }}
   namespace: {{ .Release.Namespace }}
@@ -21,26 +23,23 @@ spec:
       nodeSelector:
 {{ toYaml . | indent 8 }}
       {{- end }}
-      volumes:
-        - name: configs
-          hostPath:
-            path: /scl/config-server/src/main/resources/configs
-            type: DirectoryOrCreate
       containers:
         - name: {{ $service.name }}
           image: {{ $image }}
           imagePullPolicy: {{ .Values.general.imagePullPolicy }}
           ports:
             - containerPort: {{ $service.containerPort }}
-          volumeMounts:
-            - name: configs
-              mountPath: /opt/mecc/configs
           env:
-            - name: ENCRYPT_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}-{{ $service.name }}
-                  key: encryptKey
+            - name: CONFIG_SERVER_URL
+              value: "http://{{ .Release.Name }}-{{ $configServer.name }}.{{ .Release.Namespace }}.svc.cluster.local:{{ $configServer.clusterPort }}"
+            - name: DISCOVERY_SERVICES
+              value: "http://{{ .Release.Name }}-{{ $discoveryServer.name }}.{{ .Release.Namespace }}.svc.cluster.local:{{ $discoveryServer.clusterPort }}/eureka/"
+            - name: SPRING_PROFILES_ACTIVE
+              value: "dev"
+            - name: EXCHANGE_RATE_SERVICE_NAME
+              value: "exchange-rate"
+            - name: CURRENCY_SERVICE_NAME
+              value: "currency"
 ---
 apiVersion: v1
 kind: Service
@@ -73,10 +72,3 @@ spec:
         targetPort: {{ $service.containerPort }}
 ---
 {{- end }}
-apiVersion: v1
-kind: Secret
-metadata:
-  name: {{ .Release.Name }}-{{ $service.name }}
-  namespace: {{ .Release.Namespace }}
-data:
-  encryptKey: "bWVjY2tleQo="
