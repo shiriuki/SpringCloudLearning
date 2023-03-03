@@ -1,0 +1,12 @@
+general:
+  imagePullPolicy: Never  # Never will use images from local machine (docker local registry)
+  imageTag: 1.0.0
+
+configServer:
+  name: config-server
+  image: com.mecc/config-server
+  containerPort: 8888
+  servicePort: 8888
+  replicas: 1
+  servicesNodeSelector:
+

@@ -1,0 +1,22 @@
+# This requires a volume pointing to /scl has previously been mounted.
+# In minikube you can do that by doing (at the root folder of this repository):
+minikube mount .:/scl
+
+# There is a bug in minikube and sometimes it may fail to load the volume:
+# https://github.com/kubernetes/minikube/issues/12729
+# To fix that run
+minikube ip
+
+# Then run the mount command but with the additional ip parameter (replace the last value of the ip for 1)
+minikube mount .:/scl --ip 192.168.205.1
+
+# To verify the volume was successfully mounted do this (you should see the contents of this repo there):
+minikube ssh
+ls /scl
+
+# To validate this Helm Chart
+helm install --dry-run --debug -f ./values.yaml mecc .
+
+# To install
+helm install -f ./values.yaml mecc .
+
