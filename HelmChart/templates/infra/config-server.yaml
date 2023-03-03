@@ -1,0 +1,55 @@
+{{- $name := .Values.configServer.name }}
+{{- $replicas := .Values.configServer.replicas }}
+{{- $nodeSel := .Values.configServer.nodeSelector }}
+{{- $image := printf "%s:%s" .Values.configServer.image .Values.general.imageTag }}
+{{- $containerPort := .Values.configServer.containerPort }}
+{{- $servicePort := .Values.configServer.servicePort }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-{{ $name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}-{{ $name }}
+spec:
+  replicas: {{ $replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-{{ $name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-{{ $name }}
+    spec:
+      {{- with $nodeSel }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ $name }}
+          image: {{ $image }}
+          imagePullPolicy: {{ .Values.general.imagePullPolicy }}
+          ports:
+            - containerPort: {{ $containerPort }}
+          volumeMounts:
+            - mountPath: /opt/mecc/configs
+              name: configs
+      volumes:
+        - name: configs
+          hostPath:
+            path: /scl/config-server/src/main/resources/configs
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-{{ $name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ .Release.Name }}-{{ $name }}
+  ports:
+      - protocol: TCP
+        port: {{ $servicePort }}
+        targetPort: {{ $containerPort }}
