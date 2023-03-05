@@ -24,18 +24,23 @@ spec:
 {{ toYaml . | indent 8 }}
       {{- end }}
       containers:
-        - livenessProbe:
+        - startupProbe:
             httpGet:
               path: /actuator/health/liveness
               port: {{ $service.containerPort }}
-            initialDelaySeconds: {{ $service.startupTimeInSecs }}
+            initialDelaySeconds: {{ .Values.general.minimumStartupDelayInSecs }}
+            periodSeconds: {{ .Values.general.startupProbePeriod }}
+            failureThreshold: {{ .Values.general.startupFailureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: {{ $service.containerPort }}
             periodSeconds: {{ .Values.general.livenessProbePeriod }}
             failureThreshold: {{ .Values.general.livenessFailureThreshold }}
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
               port: {{ $service.containerPort }}
-            initialDelaySeconds: {{ $service.startupTimeInSecs }}
             periodSeconds: {{ .Values.general.readinessProbePeriod }}
             failureThreshold: {{ .Values.general.readinessFailureThreshold }}
           resources:

@@ -24,16 +24,20 @@ spec:
 {{ toYaml . | indent 8 }}
       {{- end }}
       containers:
-        - livenessProbe:
-            tcpSocket:
+        - startupProbe:
+            grpc:   # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-a-grpc-liveness-probe  https://github.com/yidongnan/grpc-spring-boot-starter/issues/123
               port: {{ $service.containerPort }}
-            initialDelaySeconds: {{ $service.startupTimeInSecs }}
+            initialDelaySeconds: {{ .Values.general.minimumStartupDelayInSecs }}
+            periodSeconds: {{ .Values.general.startupProbePeriod }}
+            failureThreshold: {{ .Values.general.startupFailureThreshold }}
+          livenessProbe:
+            grpc:
+              port: {{ $service.containerPort }}
             periodSeconds: {{ .Values.general.livenessProbePeriod }}
             failureThreshold: {{ .Values.general.livenessFailureThreshold }}
           readinessProbe:
-            tcpSocket:
+            grpc:
               port: {{ $service.containerPort }}
-            initialDelaySeconds: {{ $service.startupTimeInSecs }}
             periodSeconds: {{ .Values.general.readinessProbePeriod }}
             failureThreshold: {{ .Values.general.readinessFailureThreshold }}
           resources:
