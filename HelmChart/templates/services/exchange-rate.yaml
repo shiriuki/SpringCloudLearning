@@ -36,6 +36,10 @@ spec:
             initialDelaySeconds: {{ $service.startupTimeInSecs }}
             periodSeconds: {{ .Values.general.readinessProbePeriod }}
             failureThreshold: {{ .Values.general.readinessFailureThreshold }}
+          resources:
+            requests:
+              memory: {{ $service.requests.mem }}
+              cpu: {{ $service.requests.cpu }}
           name: {{ $service.name }}
           image: {{ $image }}
           imagePullPolicy: {{ .Values.general.imagePullPolicy }}
