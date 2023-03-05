@@ -53,7 +53,7 @@ spec:
             - containerPort: {{ $service.containerPort }}
           env:
             - name: CONFIG_SERVER_URL
-              value: "http://{{ .Release.Name }}-{{ $configServer.name }}.{{ .Release.Namespace }}.svc.cluster.local:{{ $configServer.clusterPort }}"
+              value: "http://{{ .Release.Name }}-{{ $configServer.name }}.{{ .Release.Namespace }}:{{ $configServer.clusterPort }}"
             - name: EUREKA_CLIENT_REGISTERWITHEUREKA
               value: "false"
             - name: EUREKA_CLIENT_FETCHREGISTRY

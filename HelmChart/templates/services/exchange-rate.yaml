@@ -51,9 +51,9 @@ spec:
             - containerPort: {{ $service.containerPort }}
           env:
             - name: CONFIG_SERVER_URL
-              value: "http://{{ .Release.Name }}-{{ $configServer.name }}.{{ .Release.Namespace }}.svc.cluster.local:{{ $configServer.clusterPort }}"
+              value: "http://{{ .Release.Name }}-{{ $configServer.name }}.{{ .Release.Namespace }}:{{ $configServer.clusterPort }}"
             - name: DISCOVERY_SERVICES
-              value: "http://{{ .Release.Name }}-{{ $discoveryServer.name }}.{{ .Release.Namespace }}.svc.cluster.local:{{ $discoveryServer.clusterPort }}/eureka/"
+              value: "http://{{ .Release.Name }}-{{ $discoveryServer.name }}.{{ .Release.Namespace }}:{{ $discoveryServer.clusterPort }}/eureka/"
             - name: SPRING_PROFILES_ACTIVE
               value: "dev"
 ---
