@@ -24,7 +24,19 @@ spec:
 {{ toYaml . | indent 8 }}
       {{- end }}
       containers:
-        - name: {{ $service.name }}
+        - livenessProbe:
+            tcpSocket:
+              port: {{ $service.containerPort }}
+            initialDelaySeconds: {{ $service.startupTimeInSecs }}
+            periodSeconds: {{ .Values.general.livenessProbePeriod }}
+            failureThreshold: {{ .Values.general.livenessFailureThreshold }}
+          readinessProbe:
+            tcpSocket:
+              port: {{ $service.containerPort }}
+            initialDelaySeconds: {{ $service.startupTimeInSecs }}
+            periodSeconds: {{ .Values.general.readinessProbePeriod }}
+            failureThreshold: {{ .Values.general.readinessFailureThreshold }}
+          name: {{ $service.name }}
           image: {{ $image }}
           imagePullPolicy: {{ .Values.general.imagePullPolicy }}
           ports:

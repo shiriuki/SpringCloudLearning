@@ -1,6 +1,10 @@
 general:
   imagePullPolicy: Never  # Never will use images from local machine (docker local registry)
   imageTag: 1.0.0
+  livenessProbePeriod: 3
+  livenessFailureThreshold: 3
+  readinessProbePeriod: 2
+  readinessFailureThreshold: 2
 
 configServer:
   name: config-server
@@ -8,6 +12,7 @@ configServer:
   containerPort: 8888
   clusterPort: 8888
   replicas: 1
+  startupTimeInSecs: 12
   externalAccess:
     enabled: true
     port: 30888  # Typically in the range 30000-32768
@@ -19,20 +24,10 @@ serviceDiscovery:
   containerPort: 8889
   clusterPort: 8889
   replicas: 1
+  startupTimeInSecs: 40  # It depends on configServer, should be higher than its.
   externalAccess:
     enabled: true
     port: 30889  # Typically in the range 30000-32768
-  nodeSel:
-
-simpleRest:
-  name: simple-rest
-  image: com.mecc/simple-rest
-  containerPort: 9003
-  clusterPort: 9003
-  replicas: 1
-  externalAccess:
-    enabled: true
-    port: 30890  # Typically in the range 30000-32768
   nodeSel:
 
 currency:
@@ -41,6 +36,7 @@ currency:
   containerPort: 9004
   clusterPort: 9004
   replicas: 1
+  startupTimeInSecs: 42  # It depends on serviceDiscovery, should be higher than its.
   externalAccess:
     enabled: false
   nodeSel:
@@ -51,7 +47,20 @@ exchangeRate:
   containerPort: 9002
   clusterPort: 9002
   replicas: 1
+  startupTimeInSecs: 42  # It depends on serviceDiscovery, should be higher than its.
   externalAccess:
     enabled: false
+  nodeSel:
+
+simpleRest:
+  name: simple-rest
+  image: com.mecc/simple-rest
+  containerPort: 9003
+  clusterPort: 9003
+  replicas: 1
+  startupTimeInSecs: 44  # It depends on exchangeRate and currency, should be higher than theirs.
+  externalAccess:
+    enabled: true
+    port: 30890  # Typically in the range 30000-32768
   nodeSel:
 

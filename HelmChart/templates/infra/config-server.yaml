@@ -27,7 +27,21 @@ spec:
             path: /scl/config-server/src/main/resources/configs
             type: DirectoryOrCreate
       containers:
-        - name: {{ $service.name }}
+        - livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: {{ $service.containerPort }}
+            initialDelaySeconds: {{ $service.startupTimeInSecs }}
+            periodSeconds: {{ .Values.general.livenessProbePeriod }}
+            failureThreshold: {{ .Values.general.livenessFailureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{ $service.containerPort }}
+            initialDelaySeconds: {{ $service.startupTimeInSecs }}
+            periodSeconds: {{ .Values.general.readinessProbePeriod }}
+            failureThreshold: {{ .Values.general.readinessFailureThreshold }}
+          name: {{ $service.name }}
           image: {{ $image }}
           imagePullPolicy: {{ .Values.general.imagePullPolicy }}
           ports:
