@@ -1,13 +1,15 @@
 general:
   imagePullPolicy: Never  # Never will use images from local machine (docker local registry)
   imageTag: 1.0.0
-  minimumStartupDelayInSecs: 5
-  startupProbePeriod: 3
-  startupFailureThreshold: 20
+  minimumStartupDelayInSecs: 5  # Minimum time any container will need to start up.
+  startupProbePeriod: 3  # How oftern it will check if the container has finished its start up.
+  startupFailureThreshold: 20  # Max number of time it will check if the container has finished its start up.
   livenessProbePeriod: 2
-  livenessFailureThreshold: 2
+  livenessFailureThreshold: 2  # How often will check if the container is alive,
   readinessProbePeriod: 2
-  readinessFailureThreshold: 2
+  readinessFailureThreshold: 2  # How often will check if the container can handle requests.
+  preStopTimeInSec: 10  # PreStop gives time for the actual pod state to propagate and stop receiving requests.
+  maxGracefulTimeInSecs: 72  # PreStop hook time + Spring grateful shutdown time + 2 secs (to allow Spring to finish).
 
 configServer:
   name: config-server

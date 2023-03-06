@@ -26,8 +26,13 @@ spec:
           hostPath:
             path: /scl/config-server/src/main/resources/configs
             type: DirectoryOrCreate
+      terminationGracePeriodSeconds: {{ .Values.general.maxGracefulTimeInSecs }}
       containers:
-        - startupProbe:
+        - lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-c", "sleep {{ .Values.general.preStopTimeInSec }}"]  # Prevent requests from being received while the container is terminated and the Pod status is propageted:  https://hackmd.io/@ryanjbaxter/spring-on-k8s-workshop#Graceful-Shutdown https://linkerd.io/2.12/tasks/graceful-shutdown/#graceful-shutdown-in-kubernetes
+          startupProbe:
             httpGet:
               path: /actuator/health/liveness
               port: {{ $service.containerPort }}
@@ -70,6 +75,8 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-{{ $service.name }}
   namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}-{{ $service.name }}
 spec:
   type: ClusterIP
   selector:
@@ -85,6 +92,8 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-{{ $service.name }}-ext-access
   namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}-{{ $service.name }}
 spec:
   type: NodePort
   selector:
@@ -101,5 +110,7 @@ kind: Secret
 metadata:
   name: {{ .Release.Name }}-{{ $service.name }}
   namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}-{{ $service.name }}
 data:
   encryptKey: "bWVjY2tleQo="

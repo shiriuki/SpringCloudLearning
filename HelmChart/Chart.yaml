@@ -1,4 +1,4 @@
 apiVersion: v2
 name: mecc
-version: 1.0.5
+version: 1.0.6
 appVersion: 1.0.0-SNAPSHOT
