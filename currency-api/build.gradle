@@ -1,7 +1,7 @@
 plugins {
     id 'scl.java'
     id 'scl.spring-cloud'
-	id 'org.hidetake.swagger.generator' version '2.19.2'
+	  id 'org.hidetake.swagger.generator'
 }
 
 swaggerSources {
@@ -33,10 +33,10 @@ sourceSets.main.resources.srcDir "${swaggerSources.Currency.code.outputDir}/src/
 dependencies {
     // OpenAPI Starts
     swaggerCodegen 'org.openapitools:openapi-generator-cli:6.2.1'
-    compileOnly 'io.swagger.core.v3:swagger-annotations:2.2.7'
+    compileOnly 'io.swagger.core.v3:swagger-annotations:2.2.8'
     compileOnly 'org.springframework.boot:spring-boot-starter-validation'
-    compileOnly 'org.openapitools:jackson-databind-nullable:0.2.4'
-    compileOnly 'javax.xml.bind:jaxb-api:2.3.1'
+    compileOnly 'org.openapitools:jackson-databind-nullable:0.2.6'
+    compileOnly 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
     compileOnly 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
     compileOnly 'org.springframework.boot:spring-boot-starter-hateoas'
     compileOnly 'org.springframework.cloud:spring-cloud-starter-openfeign'

@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import java.util.List;
 
 @RefreshScope
 @RestController
@@ -35,18 +34,6 @@ public class Controller {
     @GetMapping("/showsecure")
     public ResponseEntity<String> showSecure() {
         return ResponseEntity.ok().body(secureMsg);
-    }
-
-
-    @GetMapping("/showavailable/{serviceId}")
-    public ResponseEntity<List<Service.Address>> showAvailable(@PathVariable String serviceId) {
-
-        try {
-            return ResponseEntity.ok().body(service.showAvailable(serviceId));
-
-        } catch (Throwable e) {
-            return ResponseEntity.noContent().build();
-        }
     }
 
 

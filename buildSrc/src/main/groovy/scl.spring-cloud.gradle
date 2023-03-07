@@ -15,7 +15,6 @@ task createDockerfile(type: Dockerfile) {
   destFile = project.file('build/docker/Dockerfile')
   from "eclipse-temurin:11"
   label(['maintainer': 'Manuel Calvo "manuel.calvo.cantillo@gmail.com"'])
-  runCommand "apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*"
   copyFile "${bootJar.archiveFileName.get()}", "/app/app.jar"
   environmentVariable "JAVA_OPTS", ""
   entryPoint "java"
@@ -28,6 +27,8 @@ task syncAppArchive(type: Sync) {
   into createDockerfile.getDestDir()
 }
 
+createDockerfile.dependsOn syncAppArchive
+
 task buildImage(type: DockerBuildImage) {
   dependsOn createDockerfile
   inputDir = createDockerfile.getDestDir()
@@ -36,13 +37,8 @@ task buildImage(type: DockerBuildImage) {
   images.add( "${project.group}/${project.name}:${project.version}" )
 }
 
-createDockerfile.dependsOn syncAppArchive
-
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'com.github.ben-manes.caffeine:caffeine'
-    implementation 'org.springframework.retry:spring-retry'
-    implementation 'org.springframework.boot:spring-boot-starter-aop'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 

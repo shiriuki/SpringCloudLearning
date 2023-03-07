@@ -5,6 +5,6 @@ import org.springframework.cloud.openfeign.FeignClient;
 
 public class FeignClients {
 
-    @FeignClient("${CURRENCY_SERVICE_NAME:currency}")
+    @FeignClient(name="currency", url="${CURRENCY_SERVICE:currency}")
     public interface CurrencyClient extends CurrencyApi { }
 }

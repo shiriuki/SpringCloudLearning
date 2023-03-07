@@ -25,20 +25,6 @@ configServer:
     port: 30888  # Typically in the range 30000-32768
   nodeSel:
 
-serviceDiscovery:
-  name: service-discovery
-  image: com.mecc/service-discovery-agent
-  containerPort: 8889
-  clusterPort: 8889
-  replicas: 1
-  requests:
-    mem: 628Mi # Initial x 1.5
-    cpu: 152m  # Initial x 4
-  externalAccess:
-    enabled: true
-    port: 30889  # Typically in the range 30000-32768
-  nodeSel:
-
 currency:
   name: currency
   image: com.mecc/currency
