@@ -1,5 +1,4 @@
 {{- $service := .Values.simpleRest }}
-{{- $configServer := .Values.configServer }}
 {{- $exchangeRateService := .Values.exchangeRate }}
 {{- $currencyService := .Values.currency }}
 {{- $image := printf "%s:%s" $service.image .Values.general.imageTag }}
@@ -59,10 +58,15 @@ spec:
           ports:
             - containerPort: {{ $service.containerPort }}
           env:
-            - name: CONFIG_SERVER_URL
-              value: "http://{{ .Release.Name }}-{{ $configServer.name }}.{{ .Release.Namespace }}:{{ $configServer.clusterPort }}"
             - name: SPRING_PROFILES_ACTIVE
-              value: "dev"
+              value: {{ $service.activeProfiles }}
+            - name: APP_CONFIG_MAP  # This can be used to override app properties from a ConfigMap https://docs.spring.io/spring-cloud-kubernetes/docs/2.1.5/reference/html/#configmap-propertysource
+              value: "{{ .Release.Name }}-{{ $service.name }}"
+            - name: SECRET_MSG  # This is the way to override a property that contains a secret value.
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-{{ $service.name }}
+                  key: secretMsg
             - name: EXCHANGE_RATE_SERVICE
               value: "dns:///{{ .Release.Name }}-{{ $exchangeRateService.name }}:{{ $exchangeRateService.clusterPort }}"
             - name: CURRENCY_SERVICE
@@ -103,3 +107,12 @@ spec:
         targetPort: {{ $service.containerPort }}
 ---
 {{- end }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-{{ $service.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}-{{ $service.name }}
+data:
+  secretMsg: {{ $service.secrets.secretMsg }}

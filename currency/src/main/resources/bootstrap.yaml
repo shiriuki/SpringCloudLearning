@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: currency
+  cloud:
+    kubernetes:
+      config:
+        sources:
+          - name: ${APP_CONFIG_MAP:${spring.application.name}}
+

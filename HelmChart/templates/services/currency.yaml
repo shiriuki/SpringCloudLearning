@@ -1,5 +1,4 @@
 {{- $service := .Values.currency }}
-{{- $configServer := .Values.configServer }}
 {{- $image := printf "%s:%s" $service.image .Values.general.imageTag }}
 apiVersion: apps/v1
 kind: Deployment
@@ -57,8 +56,10 @@ spec:
           ports:
             - containerPort: {{ $service.containerPort }}
           env:
-            - name: CONFIG_SERVER_URL
-              value: "http://{{ .Release.Name }}-{{ $configServer.name }}.{{ .Release.Namespace }}:{{ $configServer.clusterPort }}"
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ $service.activeProfiles }}
+            - name: APP_CONFIG_MAP  # This can be used to override app properties from a ConfigMap https://docs.spring.io/spring-cloud-kubernetes/docs/2.1.5/reference/html/#configmap-propertysource
+              value: "{{ .Release.Name }}-{{ $service.name }}"
 ---
 apiVersion: v1
 kind: Service

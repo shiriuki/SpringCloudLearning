@@ -11,20 +11,6 @@ general:
   preStopTimeInSec: 10  # PreStop gives time for the actual pod state to propagate and stop receiving requests.
   maxGracefulTimeInSecs: 72  # PreStop hook time + Spring grateful shutdown time + 2 secs (to allow Spring to finish).
 
-configServer:
-  name: config-server
-  image: com.mecc/config-server
-  containerPort: 8888
-  clusterPort: 8888
-  replicas: 1
-  requests:
-    mem: 495Mi # Initial x 1.5
-    cpu: 20m  # Initial x 4
-  externalAccess:
-    enabled: true
-    port: 30888  # Typically in the range 30000-32768
-  nodeSel:
-
 currency:
   name: currency
   image: com.mecc/currency
@@ -36,6 +22,7 @@ currency:
     cpu: 40m  # Initial x 4
   externalAccess:
     enabled: false
+  activeProfiles:  # The active profiles should NOT be used to load properties for different environments: dev, prod, etc. Instead a new Helm release should be created with different values.
   nodeSel:
 
 exchangeRate:
@@ -49,6 +36,7 @@ exchangeRate:
     cpu: 24m  # Initial x 4
   externalAccess:
     enabled: false
+  activeProfiles:  # The active profiles should NOT be used to load properties for different environments: dev, prod, etc. Instead a new Helm release should be created with different values.
   nodeSel:
 
 simpleRest:
@@ -63,5 +51,8 @@ simpleRest:
   externalAccess:
     enabled: true
     port: 30890  # Typically in the range 30000-32768
+  secrets:
+    secretMsg: "U2VjcmV0IG1lc3NhZ2UgY29tbWluZyBmcm9tIEs4cwo="   # Must be Base64 encoded.
+  activeProfiles:  # The active profiles should NOT be used to load properties for different environments: dev, prod, etc. Instead a new Helm release should be created with different values. This is more to change the way the app should behave (if needed).
   nodeSel:
 

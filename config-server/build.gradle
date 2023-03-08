@@ -1,8 +1,0 @@
-plugins {
-    id 'scl.java'
-    id 'scl.spring-cloud'
-}
-
-dependencies {
-    implementation 'org.springframework.cloud:spring-cloud-config-server'
-}

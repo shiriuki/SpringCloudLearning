@@ -16,7 +16,7 @@ public class Controller {
     @Value( "${msg}" )
     private String msg;
 
-    @Value( "${securemsg}" )
+    @Value( "${secret.msg}" )
     private String secureMsg;
 
 

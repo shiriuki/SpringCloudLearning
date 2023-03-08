@@ -1,6 +1,5 @@
 rootProject.name = 'SpringCloudLearning'
 
-include 'config-server'
 include 'grpc-lib'
 include 'exchange-rate'
 include 'simple-rest'

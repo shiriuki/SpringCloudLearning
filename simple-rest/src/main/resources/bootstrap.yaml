@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: simple-rest
+  cloud:
+    kubernetes:
+      config:
+        sources:
+          - name: ${APP_CONFIG_MAP:${spring.application.name}}
+

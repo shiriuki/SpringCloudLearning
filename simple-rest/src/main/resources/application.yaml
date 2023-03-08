@@ -1,14 +1,49 @@
-spring:
-  application:
-    name: simple-rest
-  profiles:
-    active: dev
-  cloud:
+info:
+  app:
+    name: Simple Rest Microservice
+    description: Simple Rest Microservice
+
+server:
+  port: 9003
+  shutdown: graceful
+
+msg: "Hi there!"
+secret.msg: "Secret message coming from properties"
+
+grpc:
+  client:
+    exchange-rate:
+      address: ${EXCHANGE_RATE_SERVICE:static://localhost:9002}
+      negotiationType: plaintext
+
+feign:
+  client:
     config:
-      fail-fast: true
-      retry:
-        initialInterval: 5000
-        maxInterval: 10000
-        max-attempts: 7
-  config:
-    import: configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+      default:
+        connectTimeout: 3000
+        readTimeout: 3000
+# https://www.baeldung.com/java-feign-logging
+#       loggerLevel: headers
+
+spring:
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
+  lifecycle:
+    timeout-per-shutdown-phase: 60s
+  jmx:
+    enabled: true  # https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.endpoints
+
+management:
+  endpoints:
+    enabled-by-default: false
+    web:
+      exposure.include: info, health
+  endpoint:
+    info.enabled: true
+    health.enabled: true
+    health.probes.enabled: true
+  health:
+    livenessState.enabled: true
+    readinessState.enabled: true

@@ -1,14 +1,28 @@
+info:
+  app:
+    name: Exchange Rate gRPC microservice
+    description: Exchange Rate gRPC microservice
+
+grpc:
+  server:
+    port: 9002
+    shutdownGracePeriod: 60s
+
+logging:
+  level:
+    io.grpc.netty: INFO
+
 spring:
-  application:
-    name: exchange-rate
-  profiles:
-    active: dev
-  cloud:
-    config:
-      fail-fast: true
-      retry:
-        initialInterval: 5000
-        maxInterval: 10000
-        max-attempts: 7
-  config:
-    import: configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+  lifecycle:
+    timeout-per-shutdown-phase: 60s
+  jmx:
+    enabled: true  # https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.endpoints
+
+management:
+  endpoints:
+    enabled-by-default: false
+  endpoint:
+    info.enabled: true
+    health.enabled: true
+
+

@@ -1,2 +1,0 @@
-// Pointing to Config server port in docker compose
-curl localhost:8888/encrypt -d "This is a secure message"

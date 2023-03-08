@@ -1,7 +1,6 @@
 plugins {
     id 'scl.java'
     id 'scl.spring-cloud'
-    id 'scl.service'
 }
 
 dependencies {

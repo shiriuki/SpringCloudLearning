@@ -1,22 +1,25 @@
-# This requires a volume pointing to /scl has previously been mounted.
-# In minikube you can do that by doing (at the root folder of this repository):
-minikube mount .:/scl
-
-# There is a bug in minikube and sometimes it may fail to load the volume:
-# https://github.com/kubernetes/minikube/issues/12729
-# To fix that run
-minikube ip
-
-# Then run the mount command but with the additional ip parameter (replace the last value of the ip for 1)
-minikube mount .:/scl --ip 192.168.205.1
-
-# To verify the volume was successfully mounted do this (you should see the contents of this repo there):
-minikube ssh
-ls /scl
-
 # To validate this Helm Chart
 helm install --dry-run --debug -f ./values.yaml mecc .
 
 # To install
 helm install -f ./values.yaml mecc .
 
+# The services can override their configuration from a ConfigMap.
+# https://docs.spring.io/spring-cloud-kubernetes/docs/2.1.5/reference/html/#kubernetes-propertysource-implementations
+# The ConfigMap name must be {Helm release name}-{Spring app name}
+# I can be like this:
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mecc-simple-rest
+data:
+  application.yaml: |-
+    msg: Hi from K8s
+    feign:
+      client:
+        config:
+          default:
+            connectTimeout: 1000
+
+# It can be deployed like this:
+kubectl apply -f cm.yaml
