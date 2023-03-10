@@ -1,7 +1,7 @@
 {{- $service := .Values.simpleRest }}
 {{- $exchangeRateService := .Values.exchangeRate }}
 {{- $currencyService := .Values.currency }}
-{{- $image := printf "%s:%s" $service.image .Values.general.imageTag }}
+{{- $image := printf "%s/%s:%s" .Values.general.imagePrefix $service.image .Values.general.imageTag }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

@@ -1,5 +1,6 @@
 general:
-  imagePullPolicy: Never  # Never will use images from local machine (docker local registry)
+  imagePullPolicy: Never  # When to fetch the images. Never when not using local registry. Always for local registry.
+  imagePrefix: com.mecc
   imageTag: 1.0.0
   minimumStartupDelayInSecs: 5  # Minimum time any container will need to start up.
   startupProbePeriod: 3  # How oftern it will check if the container has finished its start up.
@@ -13,10 +14,10 @@ general:
 
 currency:
   name: currency
-  image: com.mecc/currency
+  image: currency
   containerPort: 9004
   clusterPort: 9004
-  replicas: 1
+  replicas: 2
   requests:
     mem: 566Mi # Initial x 1.5
     cpu: 40m  # Initial x 4
@@ -27,10 +28,10 @@ currency:
 
 exchangeRate:
   name: exchange-rate
-  image: com.mecc/exchange-rate
+  image: exchange-rate
   containerPort: 9002
   clusterPort: 9002
-  replicas: 1
+  replicas: 2
   requests:
     mem: 538Mi # Initial x 1.5
     cpu: 24m  # Initial x 4
@@ -41,10 +42,10 @@ exchangeRate:
 
 simpleRest:
   name: simple-rest
-  image: com.mecc/simple-rest
+  image: simple-rest
   containerPort: 9003
   clusterPort: 9003
-  replicas: 1
+  replicas: 2
   requests:
     mem: 580Mi # Initial x 1.5
     cpu: 32m  # Initial x 4
