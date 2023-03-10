@@ -2,7 +2,11 @@ To validate this Helm Chart
 ```
 helm install --dry-run --debug -f ./values.yaml mecc .
 ```
-
+Before install use this to tell Kubectl to connect `multi` cluster 
+and do the installation there.
+```
+k config use-context multi
+```
 To install - if using local registry. Replace with correct IP.
 ```
 helm install --set general.imagePrefix=x.x.x.x:5000 --set general.imagePullPolicy=Always -f ./values.yaml mecc .
