@@ -6,4 +6,5 @@ spring:
       config:
         sources:
           - name: ${APP_CONFIG_MAP:${spring.application.name}}
+        enabled: ${K8S_CONFIG_ENABLED:false}
 
