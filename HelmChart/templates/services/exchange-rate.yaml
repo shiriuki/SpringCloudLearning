@@ -50,6 +50,11 @@ spec:
           name: {{ $service.name }}
           image: {{ $image }}
           imagePullPolicy: {{ .Values.general.imagePullPolicy }}
+          securityContext:  # https://elastisys.com/howto-stop-running-containers-as-root-in-kubernetes/
+            runAsNonRoot: true
+            runAsUser: 10000
+            runAsGroup: 10000
+            allowPrivilegeEscalation: false
           ports:
             - containerPort: {{ $service.containerPort }}
           env:
