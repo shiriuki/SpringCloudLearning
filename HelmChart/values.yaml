@@ -1,6 +1,6 @@
 general:
-  imagePullPolicy: Never  # When to fetch the images. Never when not using local registry. Always for local registry.
-  imagePrefix: com.mecc
+  imagePullPolicy: Always  # When to fetch the images. Never when not using local registry. Always for local registry.
+  imagePrefix: 192.168.205.43:5000  # If not local registry use something like: /com/mecc
   imageTag: 1.0.0
   minimumStartupDelayInSecs: 5  # Minimum time any container will need to start up.
   startupProbePeriod: 3  # How oftern it will check if the container has finished its start up.
@@ -24,7 +24,29 @@ currency:
   externalAccess:
     enabled: false
   activeProfiles:  # The active profiles should NOT be used to load properties for different environments: dev, prod, etc. Instead a new Helm release should be created with different values.
-  nodeSel:
+  affinities: |-
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values: ["mecc-currency"]
+          topologyKey: "kubernetes.io/hostname"
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: minikube.k8s.io/primary
+                operator: DoesNotExist
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          preference:
+            matchExpressions:
+              - key: mecc.com/node-type
+                operator: In
+                values:
+                  - backend
 
 exchangeRate:
   name: exchange-rate
@@ -38,7 +60,29 @@ exchangeRate:
   externalAccess:
     enabled: false
   activeProfiles:  # The active profiles should NOT be used to load properties for different environments: dev, prod, etc. Instead a new Helm release should be created with different values.
-  nodeSel:
+  affinities: |-
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values: ["mecc-exchange-rate"]
+          topologyKey: "kubernetes.io/hostname"
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: minikube.k8s.io/primary
+                operator: DoesNotExist
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          preference:
+            matchExpressions:
+              - key: mecc.com/node-type
+                operator: In
+                values:
+                  - backend
 
 simpleRest:
   name: simple-rest
@@ -55,5 +99,26 @@ simpleRest:
   secrets:
     secretMsg: "U2VjcmV0IG1lc3NhZ2UgY29tbWluZyBmcm9tIEs4cwo="   # Must be Base64 encoded.
   activeProfiles:  # The active profiles should NOT be used to load properties for different environments: dev, prod, etc. Instead a new Helm release should be created with different values. This is more to change the way the app should behave (if needed).
-  nodeSel:
-
+  affinities: |-
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values: ["mecc-simple-rest"]
+          topologyKey: "kubernetes.io/hostname"
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: minikube.k8s.io/primary
+                operator: DoesNotExist
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          preference:
+            matchExpressions:
+              - key: mecc.com/node-type
+                operator: In
+                values:
+                  - ext-access

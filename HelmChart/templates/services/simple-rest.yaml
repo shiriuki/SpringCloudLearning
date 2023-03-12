@@ -19,9 +19,9 @@ spec:
       labels:
         app: {{ .Release.Name }}-{{ $service.name }}
     spec:
-      {{- with $service.nodeSel }}
-      nodeSelector:
-{{ toYaml . | indent 8 }}
+      affinity:
+      {{- with $service.affinities }}
+{{ . | indent 8 }}
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.general.maxGracefulTimeInSecs }}
       containers:
