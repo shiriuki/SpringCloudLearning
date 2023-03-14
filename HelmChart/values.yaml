@@ -19,7 +19,7 @@ currency:
   clusterPort: 9004
   replicas: 2
   requests:
-    mem: 566Mi # Initial x 1.5
+    mem: 450Mi # Initial
     cpu: 40m  # Initial x 4
   externalAccess:
     enabled: false
@@ -55,7 +55,7 @@ exchangeRate:
   clusterPort: 9002
   replicas: 2
   requests:
-    mem: 538Mi # Initial x 1.5
+    mem: 400Mi # Initial
     cpu: 24m  # Initial x 4
   externalAccess:
     enabled: true
@@ -92,7 +92,7 @@ simpleRest:
   clusterPort: 9003
   replicas: 2
   requests:
-    mem: 580Mi # Initial x 1.5
+    mem: 480Mi # Initial
     cpu: 32m  # Initial x 4
   externalAccess:
     enabled: true
