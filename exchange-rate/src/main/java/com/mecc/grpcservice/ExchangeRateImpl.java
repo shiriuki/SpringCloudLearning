@@ -14,17 +14,35 @@ public class ExchangeRateImpl extends ExchangeRateServiceGrpc.ExchangeRateServic
     public void getExchangeRate(GetExchangeRateRequest request,
                                 StreamObserver<GetExchangeRateResponse> responseObserver) {
         String currency = request.getCurrency().toUpperCase();
-        log.info("Getting value for " + currency);
 
         if (!currency.equals("CRC") && !currency.equals("MXN")) {
             throw new IllegalArgumentException("don't know the exchange rate of " + currency);
         }
 
+        double val;
+
+        if (currency.equals("CRC")) {
+            double total = 0;
+
+            for (int i = 0; i < 100000; ++i) {
+                String randomStr = String.valueOf( Math.random() );
+                double random = Double.valueOf(randomStr.substring(randomStr.length() - 2));
+                total +=  Math.tan(random);
+            }
+
+            val = total;
+
+        } else {
+            val = 19.20;
+        }
+
         GetExchangeRateResponse response = GetExchangeRateResponse.newBuilder()
-                .setRate(currency.equals("CRC") ? 600 : 19.20)
+                .setRate(val)
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
+
+        log.info("Returned value for " + currency + " " + val);
     }
 
 }

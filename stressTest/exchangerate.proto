@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.mecc.grpcservice";
+option java_outer_classname = "ExchangeRateProto";
+
+service ExchangeRateService {
+    rpc GetExchangeRate (GetExchangeRateRequest) returns (GetExchangeRateResponse);
+}
+
+message GetExchangeRateRequest {
+    string currency = 1;
+}
+
+message GetExchangeRateResponse {
+    double rate = 1;
+}
