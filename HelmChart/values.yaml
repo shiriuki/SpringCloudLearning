@@ -58,7 +58,8 @@ exchangeRate:
     mem: 538Mi # Initial x 1.5
     cpu: 24m  # Initial x 4
   externalAccess:
-    enabled: false
+    enabled: true
+    port: 30002  # Typically in the range 30000-32768
   activeProfiles:  # The active profiles should NOT be used to load properties for different environments: dev, prod, etc. Instead a new Helm release should be created with different values.
   affinities: |-
     podAntiAffinity:
