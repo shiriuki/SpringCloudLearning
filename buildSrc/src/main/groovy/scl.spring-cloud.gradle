@@ -8,8 +8,14 @@ ext {
     set('springCloudVersion', "2021.0.5")
 }
 
-def dockerAPIHost= "$System.env.DOCKER_HOST"  // tcp://x.x.x.x:2376
-def localRegHost = "${dockerAPIHost.substring(6, dockerAPIHost.lastIndexOf(":"))}:5000"
+def localRegistry = false
+def dockerAPIHost=  System.getenv("DOCKER_HOST") ?: "" // tcp://x.x.x.x:2376
+def localRegHost = ""
+
+if (dockerAPIHost != "") {
+  localRegistry = true
+  localRegHost = "${dockerAPIHost.substring(6, dockerAPIHost.lastIndexOf(":"))}:5000"
+}
 
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
@@ -39,9 +45,9 @@ task buildImage(type: DockerBuildImage) {
   quiet = true
   pull = false
   images.add( "${project.group}/${project.name}:${project.version}" )
-  images.add( "${localRegHost}/${project.name}:${project.version}" )
-
+  if (localRegistry) images.add( "${localRegHost}/${project.name}:${project.version}" )
 }
+
 
 task pushImage(type: DockerPushImage) {
   dependsOn buildImage

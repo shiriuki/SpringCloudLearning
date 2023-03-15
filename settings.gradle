@@ -1,8 +1,8 @@
 rootProject.name = 'SpringCloudLearning'
 
-include 'grpc-lib'
-include 'exchange-rate'
-include 'simple-rest'
-include 'currency'
-include 'currency-api'
+include ':grpc-lib'
+include ':exchange-rate'
+include ':simple-rest'
+include ':currency'
+include ':currency-api'
 
