@@ -28,19 +28,19 @@ spec:
               exec:
                 command: [ "sh", "-c", "sleep {{ .Values.general.preStopTimeInSec }}" ]  # Prevent requests from being received while the container is terminated and the Pod status is propageted:  https://hackmd.io/@ryanjbaxter/spring-on-k8s-workshop#Graceful-Shutdown https://linkerd.io/2.12/tasks/graceful-shutdown/#graceful-shutdown-in-kubernetes
           startupProbe:
-            grpc:   # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-a-grpc-liveness-probe  https://github.com/yidongnan/grpc-spring-boot-starter/issues/123
-              port: {{ $service.containerPort }}
+            grpc: # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-a-grpc-liveness-probe  https://github.com/yidongnan/grpc-spring-boot-starter/issues/123
+              port: {{ $service.port }}
             initialDelaySeconds: {{ .Values.general.minimumStartupDelayInSecs }}
             periodSeconds: {{ .Values.general.startupProbePeriod }}
             failureThreshold: {{ .Values.general.startupFailureThreshold }}
           livenessProbe:
             grpc:
-              port: {{ $service.containerPort }}
+              port: {{ $service.port }}
             periodSeconds: {{ .Values.general.livenessProbePeriod }}
             failureThreshold: {{ .Values.general.livenessFailureThreshold }}
           readinessProbe:
             grpc:
-              port: {{ $service.containerPort }}
+              port: {{ $service.port }}
             periodSeconds: {{ .Values.general.readinessProbePeriod }}
             failureThreshold: {{ .Values.general.readinessFailureThreshold }}
           resources:
@@ -56,7 +56,7 @@ spec:
             runAsGroup: 10000
             allowPrivilegeEscalation: false
           ports:
-            - containerPort: {{ $service.containerPort }}
+            - containerPort: {{ $service.port }}
           env:
             - name: K8S_CONFIG_ENABLED
               value: 'true'
@@ -64,6 +64,8 @@ spec:
               value: {{ $service.activeProfiles }}
             - name: APP_CONFIG_MAP  # This can be used to override app properties from a ConfigMap https://docs.spring.io/spring-cloud-kubernetes/docs/2.1.5/reference/html/#configmap-propertysource
               value: "{{ .Release.Name }}-{{ $service.name }}"
+            - name: JAVA_OPTS
+              value: {{ $service.javaOpts }}
 ---
 apiVersion: v1
 kind: Service
@@ -78,8 +80,7 @@ spec:
     app: {{ .Release.Name }}-{{ $service.name }}
   ports:
     - protocol: TCP
-      port: {{ $service.clusterPort }}
-      targetPort: {{ $service.containerPort }}
+      port: {{ $service.port }}  # By default, the targetPort is set to the same value as the port field
 ---
 {{- if $service.externalAccess.enabled }}
 apiVersion: v1
@@ -94,9 +95,8 @@ spec:
   selector:
     app: {{ .Release.Name }}-{{ $service.name }}
   ports:
-      - protocol: TCP
-        nodePort: {{ $service.externalAccess.port }}
-        port: {{ $service.clusterPort }}
-        targetPort: {{ $service.containerPort }}
+    - protocol: TCP
+      port: {{ $service.port }}  # By default, the targetPort is set to the same value as the port field
+      nodePort: {{ $service.externalAccess.port }}
 ---
 {{- end }}

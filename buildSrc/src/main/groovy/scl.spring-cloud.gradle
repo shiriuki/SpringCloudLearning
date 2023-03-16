@@ -27,8 +27,8 @@ task createDockerfile(type: Dockerfile) {
   label(['maintainer': 'Manuel Calvo "manuel.calvo.cantillo@gmail.com"'])
   copyFile "${bootJar.archiveFileName.get()}", "/app/app.jar"
   environmentVariable "JAVA_OPTS", ""
-  entryPoint "java"
-  defaultCommand "-jar", "/app/app.jar"
+  entryPoint 'sh'
+  defaultCommand '-c', 'java $JAVA_OPTS -jar /app/app.jar'
 }
 
 task syncAppArchive(type: Sync) {

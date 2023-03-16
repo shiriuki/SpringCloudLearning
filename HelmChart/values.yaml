@@ -10,20 +10,20 @@ general:
   readinessProbePeriod: 2
   readinessFailureThreshold: 2  # How often will check if the container can handle requests.
   preStopTimeInSec: 10  # PreStop gives time for the actual pod state to propagate and stop receiving requests.
-  maxGracefulTimeInSecs: 72  # PreStop hook time + Spring grateful shutdown time + 2 secs (to allow Spring to finish).
+  maxGracefulTimeInSecs: 72  # PreStop hook time + Spring grateful shutdown time + 2 secs (to allow Spring to finish).cd ..
 
 currency:
   name: currency
   image: currency
-  containerPort: 9004
-  clusterPort: 9004
-  replicas: 2
+  port: "9004"
+  replicas: 1
   requests:
     mem: 450Mi # Initial
     cpu: 40m  # Initial x 4
   externalAccess:
     enabled: false
   activeProfiles:  # The active profiles should NOT be used to load properties for different environments: dev, prod, etc. Instead a new Helm release should be created with different values.
+  javaOpts:
   affinities: |-
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -51,16 +51,16 @@ currency:
 exchangeRate:
   name: exchange-rate
   image: exchange-rate
-  containerPort: 9002
-  clusterPort: 9002
-  replicas: 2
+  port: "9002"
+  replicas: 1
   requests:
     mem: 400Mi # Initial
     cpu: 24m  # Initial x 4
   externalAccess:
     enabled: true
-    port: 30002  # Typically in the range 30000-32768
+    port: "30002"  # Typically in the range 30000-32768
   activeProfiles:  # The active profiles should NOT be used to load properties for different environments: dev, prod, etc. Instead a new Helm release should be created with different values.
+  javaOpts:
   affinities: |-
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -88,18 +88,18 @@ exchangeRate:
 simpleRest:
   name: simple-rest
   image: simple-rest
-  containerPort: 9003
-  clusterPort: 9003
-  replicas: 2
+  port: "9003"
+  replicas: 1
   requests:
     mem: 480Mi # Initial
     cpu: 32m  # Initial x 4
   externalAccess:
     enabled: true
-    port: 30890  # Typically in the range 30000-32768
+    port: "30890"  # Typically in the range 30000-32768
   secrets:
     secretMsg: "U2VjcmV0IG1lc3NhZ2UgY29tbWluZyBmcm9tIEs4cwo="   # Must be Base64 encoded.
   activeProfiles:  # The active profiles should NOT be used to load properties for different environments: dev, prod, etc. Instead a new Helm release should be created with different values. This is more to change the way the app should behave (if needed).
+  javaOpts:
   affinities: |-
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:

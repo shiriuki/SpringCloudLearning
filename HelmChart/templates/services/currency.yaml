@@ -30,20 +30,20 @@ spec:
           startupProbe:
             httpGet:
               path: /actuator/health/liveness
-              port: {{ $service.containerPort }}
+              port: {{ $service.port }}
             initialDelaySeconds: {{ .Values.general.minimumStartupDelayInSecs }}
             periodSeconds: {{ .Values.general.startupProbePeriod }}
             failureThreshold: {{ .Values.general.startupFailureThreshold }}
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
-              port: {{ $service.containerPort }}
+              port: {{ $service.port }}
             periodSeconds: {{ .Values.general.livenessProbePeriod }}
             failureThreshold: {{ .Values.general.livenessFailureThreshold }}
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
-              port: {{ $service.containerPort }}
+              port: {{ $service.port }}
             periodSeconds: {{ .Values.general.readinessProbePeriod }}
             failureThreshold: {{ .Values.general.readinessFailureThreshold }}
           resources:
@@ -59,7 +59,7 @@ spec:
             runAsGroup: 10000
             allowPrivilegeEscalation: false
           ports:
-            - containerPort: {{ $service.containerPort }}
+            - containerPort: {{ $service.port }}
           env:
             - name: K8S_CONFIG_ENABLED
               value: 'true'
@@ -67,6 +67,8 @@ spec:
               value: {{ $service.activeProfiles }}
             - name: APP_CONFIG_MAP  # This can be used to override app properties from a ConfigMap https://docs.spring.io/spring-cloud-kubernetes/docs/2.1.5/reference/html/#configmap-propertysource
               value: "{{ .Release.Name }}-{{ $service.name }}"
+            - name: JAVA_OPTS
+              value: {{ $service.javaOpts }}
 ---
 apiVersion: v1
 kind: Service
@@ -81,8 +83,7 @@ spec:
     app: {{ .Release.Name }}-{{ $service.name }}
   ports:
     - protocol: TCP
-      port: {{ $service.clusterPort }}
-      targetPort: {{ $service.containerPort }}
+      port: {{ $service.port }}  # By default, the targetPort is set to the same value as the port field
 ---
 {{- if $service.externalAccess.enabled }}
 apiVersion: v1
@@ -97,9 +98,8 @@ spec:
   selector:
     app: {{ .Release.Name }}-{{ $service.name }}
   ports:
-      - protocol: TCP
-        nodePort: {{ $service.externalAccess.port }}
-        port: {{ $service.clusterPort }}
-        targetPort: {{ $service.containerPort }}
+    - protocol: TCP
+      port: {{ $service.port }}  # By default, the targetPort is set to the same value as the port field
+      nodePort: {{ $service.externalAccess.port }}
 ---
 {{- end }}
