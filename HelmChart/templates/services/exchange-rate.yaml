@@ -1,5 +1,15 @@
 {{- $service := .Values.exchangeRate }}
 {{- $image := printf "%s/%s:%s" .Values.general.imagePrefix $service.image .Values.general.imageTag }}
+{{- $javaOptsSep := ""}}
+{{- $javaOpts := ""}}
+{{- if .Values.general.jmxEnabled }}
+  {{- $javaOpts = printf "%s%s%s" $javaOpts $javaOptsSep "-Djava.rmi.server.hostname=127.0.0.1 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=30500 -Dcom.sun.management.jmxremote.rmi.port=30500 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false" }}
+  {{- $javaOptsSep = printf " " }}
+{{- end }}
+{{- if $service.javaOpts }}
+  {{- $javaOpts = printf "%s%s%s" $javaOpts $javaOptsSep $service.javaOpts }}
+  {{- $javaOptsSep = printf " " }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -65,7 +75,7 @@ spec:
             - name: APP_CONFIG_MAP  # This can be used to override app properties from a ConfigMap https://docs.spring.io/spring-cloud-kubernetes/docs/2.1.5/reference/html/#configmap-propertysource
               value: "{{ .Release.Name }}-{{ $service.name }}"
             - name: JAVA_OPTS
-              value: {{ $service.javaOpts }}
+              value: {{ $javaOpts }}
 ---
 apiVersion: v1
 kind: Service

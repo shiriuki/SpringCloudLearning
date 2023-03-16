@@ -11,6 +11,7 @@ general:
   readinessFailureThreshold: 2  # How often will check if the container can handle requests.
   preStopTimeInSec: 10  # PreStop gives time for the actual pod state to propagate and stop receiving requests.
   maxGracefulTimeInSecs: 72  # PreStop hook time + Spring grateful shutdown time + 2 secs (to allow Spring to finish).cd ..
+  jmxEnabled: true
 
 currency:
   name: currency
