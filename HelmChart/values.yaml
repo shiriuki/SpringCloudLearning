@@ -1,6 +1,6 @@
 general:
   imagePullPolicy: Always  # When to fetch the images. Never when not using local registry. Always for local registry.
-  imagePrefix: 192.168.205.43:5000  # If not local registry use something like: /com/mecc
+  imagePrefix: 192.168.205.69:5000  # If not local registry use something like: /com/mecc
   imageTag: 1.0.0
   minimumStartupDelayInSecs: 5  # Minimum time any container will need to start up.
   startupProbePeriod: 3  # How oftern it will check if the container has finished its start up.
@@ -46,8 +46,7 @@ currency:
             matchExpressions:
               - key: mecc.com/node-type
                 operator: In
-                values:
-                  - backend
+                values: ["backend"]
 
 exchangeRate:
   name: exchange-rate
@@ -83,8 +82,7 @@ exchangeRate:
             matchExpressions:
               - key: mecc.com/node-type
                 operator: In
-                values:
-                  - backend
+                values: ["backend"]
 
 simpleRest:
   name: simple-rest
@@ -122,5 +120,4 @@ simpleRest:
             matchExpressions:
               - key: mecc.com/node-type
                 operator: In
-                values:
-                  - ext-access
+                values: ["backend"]
