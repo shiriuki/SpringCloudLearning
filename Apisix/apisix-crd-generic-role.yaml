@@ -19,6 +19,53 @@ spec:
           mwIDAQAB
           -----END PUBLIC KEY-----
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpbin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpbin
+  template:
+    metadata:
+      labels:
+        app: httpbin
+    spec:
+      containers:
+      - name: httpbin
+        image: kennethreitz/httpbin
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpbin
+  labels:
+    app: httpbin
+spec:
+  type: ClusterIP
+  selector:
+    app: httpbin
+  ports:
+  - port: 8080
+    targetPort: 80
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixUpstream
+metadata:
+  name: httpbin
+spec:
+  loadbalancer:
+    type: roundrobin  # Others: ewma (least latency), chash (hash on value), least_conn
+  retries: 1
+  timeout:
+    connect: 2s
+    send: 2s
+    read: 2s
+---
 apiVersion: apisix.apache.org/v2
 kind: ApisixUpstream
 metadata:
@@ -38,8 +85,8 @@ metadata:
   name: jwt-authentication-standard
 spec:
   plugins:
-    - name: jwt-auth
-      enable: true
+  - name: jwt-auth
+    enable: true
 ---
 apiVersion: apisix.apache.org/v2
 kind: ApisixPluginConfig
@@ -47,21 +94,21 @@ metadata:
   name: jwt-authorization-standard
 spec:
   plugins:
-    - name: jwt-auth
-      enable: true
-    - name: in-jwt-list-claim
-      enable: true
-      config:
-        claim_name: roles
-        method_reqs:
-          - method: GET
-            one_of_these: [ "EDITOR", "VIEWER" ]
-          - method: PUT
-            one_of_these: [ "EDITOR" ]
-          - method: DELETE
-            one_of_these: [ "EDITOR" ]
-          - method: POST
-            one_of_these: [ "EDITOR" ]
+  - name: jwt-auth
+    enable: true
+  - name: in-jwt-list-claim
+    enable: true
+    config:
+      claim_name: roles
+      method_reqs:
+      - method: GET
+        one_of_these: [ "EDITOR", "VIEWER" ]
+      - method: PUT
+        one_of_these: [ "EDITOR" ]
+      - method: DELETE
+        one_of_these: [ "EDITOR" ]
+      - method: POST
+        one_of_these: [ "EDITOR" ]
 ---         
 apiVersion: apisix.apache.org/v2
 kind: ApisixRoute
@@ -69,26 +116,39 @@ metadata:
   name: simple-service-routes
 spec:
   http:
-    - name: everybody
-      match:
-        paths:
-          - /sayhello
-      backends:
-      - serviceName: mecc-simple-rest
-        servicePort: 9003
-    - name: only-auth
-      match:
-        paths:
-        - /getrate/*
-      plugin_config_name: jwt-authentication-standard
-      backends:
-      - serviceName: mecc-simple-rest
-        servicePort: 9003
-    - name: only-admin
-      match:
-        paths:
-        - /showsecure
-      plugin_config_name: jwt-authorization-standard
-      backends:
-      - serviceName: mecc-simple-rest
-        servicePort: 9003
+  - name: everybody
+    match:
+      paths:
+        - /sayhello
+    backends:
+    - serviceName: mecc-simple-rest
+      servicePort: 9003
+  - name: only-auth
+    match:
+      paths:
+      - /getrate/*
+    plugin_config_name: jwt-authentication-standard
+    backends:
+    - serviceName: mecc-simple-rest
+      servicePort: 9003
+  - name: only-admin
+    match:
+      paths:
+      - /showsecure
+    plugin_config_name: jwt-authorization-standard
+    backends:
+    - serviceName: mecc-simple-rest
+      servicePort: 9003
+  - name: httpbin
+    match:
+      paths:
+        - /httpbin/*
+    plugin_config_name: jwt-authorization-standard
+    plugins:
+    - name: proxy-rewrite
+      enable: true
+      config:
+        regex_uri: ["^/httpbin/(.*)", "/$1"]
+    backends:
+    - serviceName: httpbin
+      servicePort: 8080
