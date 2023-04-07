@@ -1,0 +1,62 @@
+apiVersion: apisix.apache.org/v2
+kind: ApisixConsumer
+metadata:
+  name: extapp
+spec:
+  authParameter:
+    jwtAuth:
+      value:
+        key: extapp
+        algorithm: RS256
+        public_key: |
+          -----BEGIN PUBLIC KEY-----
+          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu1SU1LfVLPHCozMxH2Mo
+          4lgOEePzNm0tRgeLezV6ffAt0gunVTLw7onLRnrq0/IzW7yWR7QkrmBL7jTKEn5u
+          +qKhbwKfBstIs+bMY2Zkp18gnTxKLxoS2tFczGkPLPgizskuemMghRniWaoLcyeh
+          kd3qqGElvW/VDL5AaWTg0nLVkjRo9z+40RQzuVaE8AkAFmxZzow3x+VJYKdjykkJ
+          0iT9wCS0DRTXu269V264Vf/3jvredZiKRkgwlL9xNAwxXFg0x/XFw005UWVRIkdg
+          cKWTjpBP2dPwVZ4WWC+9aGVd+Gyn1o0CLelf4rEjGoXbAAEgAqeGUxrcIlbjXfbc
+          mwIDAQAB
+          -----END PUBLIC KEY-----
+---         
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: simple-service-routes
+spec:
+  http:
+    - name: everybody
+      match:
+        paths:
+          - /sayhello
+      backends:
+      - serviceName: mecc-simple-rest
+        servicePort: 9003
+    - name: only-auth
+      match:
+        paths:
+        - /getrate/*
+      backends:
+      - serviceName: mecc-simple-rest
+        servicePort: 9003
+      authentication:
+        enable: true
+        type: jwtAuth
+    - name: only-admin
+      match:
+        paths:
+        - /showsecure
+      backends:
+      - serviceName: mecc-simple-rest
+        servicePort: 9003
+      authentication:
+        enable: true
+        type: jwtAuth
+      plugins:
+      - name: in-jwt-list-claim
+        enable: true
+        config:
+          claim_name: roles
+          method_reqs:
+          - method: ANY
+            one_of_these: ["ADMIN"]
