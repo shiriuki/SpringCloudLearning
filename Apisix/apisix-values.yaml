@@ -1,0 +1,17 @@
+# see 
+# https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix/values.yaml
+# https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix-ingress-controller/values.yaml
+customPlugins:
+  enabled: true
+  plugins:
+    - name: "in-jwt-list-claim"
+      attrs: {}
+      configMap:
+        name: "plugin-in-jwt-list-claim"
+        mounts:
+          - key: "in-jwt-list-claim.lua"
+            path: "/usr/local/apisix/apisix/plugins/in-jwt-list-claim.lua"
+etcd:
+  replicaCount: 1
+ingress-controller:
+  enabled: true

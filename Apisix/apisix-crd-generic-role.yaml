@@ -1,0 +1,94 @@
+apiVersion: apisix.apache.org/v2
+kind: ApisixConsumer
+metadata:
+  name: extapp
+spec:
+  authParameter:
+    jwtAuth:
+      value:
+        key: extapp
+        algorithm: RS256
+        public_key: |
+          -----BEGIN PUBLIC KEY-----
+          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu1SU1LfVLPHCozMxH2Mo
+          4lgOEePzNm0tRgeLezV6ffAt0gunVTLw7onLRnrq0/IzW7yWR7QkrmBL7jTKEn5u
+          +qKhbwKfBstIs+bMY2Zkp18gnTxKLxoS2tFczGkPLPgizskuemMghRniWaoLcyeh
+          kd3qqGElvW/VDL5AaWTg0nLVkjRo9z+40RQzuVaE8AkAFmxZzow3x+VJYKdjykkJ
+          0iT9wCS0DRTXu269V264Vf/3jvredZiKRkgwlL9xNAwxXFg0x/XFw005UWVRIkdg
+          cKWTjpBP2dPwVZ4WWC+9aGVd+Gyn1o0CLelf4rEjGoXbAAEgAqeGUxrcIlbjXfbc
+          mwIDAQAB
+          -----END PUBLIC KEY-----
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixUpstream
+metadata:
+  name: mecc-simple-rest
+spec:
+  loadbalancer:
+    type: least_conn  # Others: ewma (least latency), chash (hash on value), roundrobin
+  retries: 1
+  timeout:
+    connect: 2s
+    send: 2s
+    read: 2s
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixPluginConfig
+metadata:
+  name: jwt-authentication-standard
+spec:
+  plugins:
+    - name: jwt-auth
+      enable: true
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixPluginConfig
+metadata:
+  name: jwt-authorization-standard
+spec:
+  plugins:
+    - name: jwt-auth
+      enable: true
+    - name: in-jwt-list-claim
+      enable: true
+      config:
+        claim_name: roles
+        method_reqs:
+          - method: GET
+            one_of_these: [ "EDITOR", "VIEWER" ]
+          - method: PUT
+            one_of_these: [ "EDITOR" ]
+          - method: DELETE
+            one_of_these: [ "EDITOR" ]
+          - method: POST
+            one_of_these: [ "EDITOR" ]
+---         
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: simple-service-routes
+spec:
+  http:
+    - name: everybody
+      match:
+        paths:
+          - /sayhello
+      backends:
+      - serviceName: mecc-simple-rest
+        servicePort: 9003
+    - name: only-auth
+      match:
+        paths:
+        - /getrate/*
+      plugin_config_name: jwt-authentication-standard
+      backends:
+      - serviceName: mecc-simple-rest
+        servicePort: 9003
+    - name: only-admin
+      match:
+        paths:
+        - /showsecure
+      plugin_config_name: jwt-authorization-standard
+      backends:
+      - serviceName: mecc-simple-rest
+        servicePort: 9003
