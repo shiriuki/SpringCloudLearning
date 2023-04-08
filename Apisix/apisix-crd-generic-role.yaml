@@ -145,6 +145,41 @@ spec:
         - /httpbin/*
     plugin_config_name: jwt-authorization-standard
     plugins:
+    # Go to https://mockbin.org/bin/99c2dcca-b874-4f73-aa96-ce9a6a6e7d9d/log to see the logs
+    - name: http-logger
+      enable: true
+      config:
+        uri: https://mockbin.org/bin/99c2dcca-b874-4f73-aa96-ce9a6a6e7d9d
+        log_format: {
+          "timestamp": "$time_iso8601",
+          "auth": "$http_authorization",
+          "reqURI": "$request_uri",
+          "reqMethod": "$request_method",
+          "reqBody": "$request_body",
+          "respCode": "$status",
+          "upstreamConnTime": "$upstream_connect_time",
+          "upstreamQueueTime": "$upstream_queue_time",
+          "upstreamRespTime": "$upstream_response_time",
+          "upstreamStatus": "$upstream_status"
+        }
+    - name: udp-logger
+      enable: true
+      config:
+        host: default-microservice
+        port: 9090
+        timeout: 2  # in secs
+        log_format: {
+          "timestamp": "$time_iso8601",
+          "auth": "$http_authorization",
+          "reqURI": "$request_uri",
+          "reqMethod": "$request_method",
+          "reqBody": "$request_body",
+          "respCode": "$status",
+          "upstreamConnTime": "$upstream_connect_time",
+          "upstreamQueueTime": "$upstream_queue_time",
+          "upstreamRespTime": "$upstream_response_time",
+          "upstreamStatus": "$upstream_status"
+        }
     - name: proxy-rewrite
       enable: true
       config:
