@@ -1,6 +1,18 @@
 # see 
 # https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix/values.yaml
+# https://github.com/apache/apisix/blob/0bc65ea9acd726f79f80ae0abd8f50b7eb172e3d/conf/config-default.yaml
 # https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix-ingress-controller/values.yaml
+gateway:
+  type: NodePort
+  http:
+    nodePort: 32000
+etcd:
+  replicaCount: 1
+ingress-controller:
+  enabled: true
+  config:
+    apisix:
+      serviceNamespace: apisix
 customPlugins:
   enabled: true
   plugins:
@@ -11,7 +23,9 @@ customPlugins:
         mounts:
           - key: "in-jwt-list-claim.lua"
             path: "/usr/local/apisix/apisix/plugins/in-jwt-list-claim.lua"
-etcd:
-  replicaCount: 1
-ingress-controller:
-  enabled: true
+pluginAttrs:
+  prometheus:  # See: https://apisix.apache.org/docs/apisix/plugins/prometheus/
+    prefer_name: true
+serviceMonitor:
+  enabled: true  # Scrapes metrics for Prometheus
+  interval: 10s

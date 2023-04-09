@@ -1,11 +1,7 @@
-This document explains how to use Apisix as a K8s ingress controller.
+This document explains how to use Apisix as a K8s ingress controller. 
+Also installs Prometheus and Grafana for observability.
 It assumes you have a minikube cluster installed and running the microservices
 created by this repo.
-
-More about Apisix ingress controller: 
-https://apisix.apache.org/docs/ingress-controller/getting-started/
-https://navendu.me/posts/hands-on-set-up-ingress-on-kubernetes-with-apache-apisix-ingress-controller/
-https://navendu.me/posts/custom-plugins-in-apisix-ingress/
 
 To try this you will need these JWTs, created using this page: https://jwt.io/
 ````
@@ -71,32 +67,81 @@ dn/RsYEONbwQSjIfMPkvxF+8HQ==
 
 Install local-path volume provisioner
 ------
+See: https://github.com/rancher/local-path-provisioner
 ````
 k patch storageclass standard -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
 k apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.24/deploy/local-path-storage.yaml
 k patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 ````
 
-Create custom plugin
+Install Prometheus operator to deploy Prometheus.
 ------
+See:
+* https://dev.to/thenjdevopsguy/how-to-configure-kube-prometheus-4njh
+* https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
 ````
-k create ns ingress-apisix
-k -n ingress-apisix create configmap plugin-in-jwt-list-claim --from-file=./in-jwt-list-claim.lua 
+k create ns prometheus
+h -n prometheus install prometheus prometheus-community/kube-prometheus-stack 
 ````
 
-Install apisix as ingress controller
+Create Apisix custom plugin
 ------
+See: https://navendu.me/posts/custom-plugins-in-apisix-ingress/
+````
+k create ns apisix
+k -n apisix create configmap plugin-in-jwt-list-claim --from-file=./in-jwt-list-claim.lua 
+````
+
+Install Apisix as ingress controller
+------
+See:
+* https://apisix.apache.org/docs/ingress-controller/getting-started/
 ````
 h repo add apisix https://charts.apiseven.com
-h repo add bitnami https://charts.bitnami.com/bitnami
 h repo update
-h -n ingress-apisix install apisix apisix/apisix  --values ./apisix-values.yaml
+h -n apisix install apisix apisix/apisix --values ./apisix-values.yaml
+````
+After this, the Apisix server's metrics for Prometheus can be accessed here:
+````
+k exec -n apisix -it apisix-68c9b5d8df-xbqpc -- curl http://127.0.0.1:9091/apisix/prometheus/metrics -i
+````
+
+Starting Prometheus for Ingress controller.
+------
+See:
+* https://blog.container-solutions.com/prometheus-operator-beginners-guide
+* https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.Prometheus
+````
+k apply -f ./apisix-prometheus.yaml
 ````
 
 Create testing routes
 ------
+See:
+* https://navendu.me/posts/hands-on-set-up-ingress-on-kubernetes-with-apache-apisix-ingress-controller/
 ````
 k apply -f ./apisix-crd-generic-role.yaml
 ````
 
+Loading Grafana's ingress controller dashboard
+------
+See:
+* https://dev.to/thenjdevopsguy/how-to-configure-kube-prometheus-4njh
+* https://medium.com/@ApacheAPISIX/monitoring-apisix-ingress-controller-with-prometheus-4ea714d0ff3c
+````
+k -n prometheus port-forward svc/prometheus-grafana 3000:80
+````
+Open browser ``http://localhost:3000/datasources``. Credentials: admin / prom-operator. Click ``Add data source``. Select ``Prometheus``. Enter:
+* Name: prometheus-apisix
+* URL: http://prometheus-apisix.prometheus:9090/
+Click ``Save % test`'
+
+Open browser ``http://localhost:3000/dashboard/import``.  Upload file ``apisix-grafana-dashboard.json`` from this folder.
+For data source select: ``prometheus-apisix``.
+
+Next install KEDA to scale based on Prometheus metrics
+------
+See:
+* https://api7.ai/blog/apisix-autoscale-applications-in-kubernetes
+* https://www.nginx.com/blog/microservices-march-reduce-kubernetes-latency-with-autoscaling/
 

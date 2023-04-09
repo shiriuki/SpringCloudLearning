@@ -1,0 +1,85 @@
+apiVersion: apisix.apache.org/v2
+kind: ApisixClusterConfig
+metadata:
+  name: default
+spec:
+  monitoring:
+    prometheus:
+      enable: true
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus-apisix
+  namespace: prometheus
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: prometheus-apisix
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - nodes/metrics
+  - services
+  - endpoints
+  - pods
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources:
+  - configmaps
+  verbs: ["get"]
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+- nonResourceURLs: ["/metrics"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus-apisix
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus-apisix
+subjects:
+- kind: ServiceAccount
+  name: prometheus-apisix
+  namespace: prometheus
+---
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: prometheus-apisix
+  namespace: prometheus
+spec:
+  serviceAccountName: prometheus-apisix
+  serviceMonitorSelector:
+    matchLabels:
+      app.kubernetes.io/instance: apisix
+      app.kubernetes.io/name: apisix
+      app.kubernetes.io/version: 3.2.0
+  serviceMonitorNamespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: apisix
+  resources:
+    requests:
+      memory: 400Mi
+  enableAdminAPI: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-apisix
+  namespace: prometheus
+spec:
+  type: ClusterIP
+  selector:
+    operator.prometheus.io/name: prometheus-apisix
+  ports:
+  - port: 9090
+    targetPort: 9090
