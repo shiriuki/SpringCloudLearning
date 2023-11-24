@@ -23,7 +23,7 @@ import com.bmuschko.gradle.docker.tasks.image.Dockerfile
 
 task createDockerfile(type: Dockerfile) {
   destFile = project.file('build/docker/Dockerfile')
-  from "eclipse-temurin:11"
+  from "eclipse-temurin:17"
   label(['maintainer': 'Manuel Calvo "manuel.calvo.cantillo@gmail.com"'])
   copyFile "${bootJar.archiveFileName.get()}", "/app/app.jar"
   environmentVariable "JAVA_OPTS", ""
